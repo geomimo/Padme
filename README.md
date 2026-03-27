@@ -15,8 +15,29 @@ A Duolingo-style web application for learning Databricks through daily quizzes, 
 
 ## Getting Started
 
-### 1. Backend
+### Docker (recommended)
 
+```bash
+docker compose up --build
+```
+
+The backend seeds the database automatically on first run.
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/docs |
+| Admin panel | http://localhost:8000/admin |
+
+To override the API URL (e.g. for a remote deployment):
+```bash
+NEXT_PUBLIC_API_URL=https://api.example.com docker compose up --build
+```
+
+### Manual (development)
+
+**Backend:**
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -24,19 +45,12 @@ python seed.py         # creates DB + inserts 8 categories, 20 lessons, 60 quizz
 uvicorn app.main:app --reload
 ```
 
-- API: http://localhost:8000
-- Swagger UI: http://localhost:8000/docs
-- Admin panel: http://localhost:8000/admin
-
-### 2. Frontend
-
+**Frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-- App: http://localhost:3000
 
 ## Seed Accounts
 

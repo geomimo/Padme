@@ -17,6 +17,7 @@ venv/
 # Env files (keep examples, ignore actuals)
 .env
 .env.local
+.env.production
 !.env.example
 
 # Next.js
