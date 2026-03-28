@@ -134,3 +134,57 @@ class UserProgress(SQLModel, table=True):
     total_quizzes: int = Field(default=0)
     correct_answers: int = Field(default=0)
     completed_at: Optional[datetime] = None
+
+
+# ---------------------------------------------------------------------------
+# Admin test plans
+# ---------------------------------------------------------------------------
+
+class TestPlan(SQLModel, table=True):
+    __tablename__ = "testplan"
+
+    id: str = Field(default_factory=_id, primary_key=True)
+    admin_id: str = Field(foreign_key="user.id")   # who created it
+    user_id: str = Field(foreign_key="user.id")    # assigned to
+    title: str
+    description: Optional[str] = None
+    status: str = Field(default="active")          # "draft" | "active" | "archived"
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class TestPlanItem(SQLModel, table=True):
+    __tablename__ = "testplanitem"
+    __table_args__ = (UniqueConstraint("test_plan_id", "quiz_id", name="uq_testplanitem"),)
+
+    id: str = Field(default_factory=_id, primary_key=True)
+    test_plan_id: str = Field(foreign_key="testplan.id")
+    quiz_id: str = Field(foreign_key="quiz.id")
+    order: int = Field(default=0)
+
+
+class TestSession(SQLModel, table=True):
+    """One attempt/sitting by a user on a TestPlan (enables history & revisit)."""
+    __tablename__ = "testsession"
+
+    id: str = Field(default_factory=_id, primary_key=True)
+    test_plan_id: str = Field(foreign_key="testplan.id")
+    user_id: str = Field(foreign_key="user.id")
+    status: str = Field(default="in_progress")     # "in_progress" | "completed"
+    xp_earned: int = Field(default=0)
+    correct_count: int = Field(default=0)
+    total_count: int = Field(default=0)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    completed_at: Optional[datetime] = None
+
+
+class TestSessionAnswer(SQLModel, table=True):
+    __tablename__ = "testsessionanswer"
+
+    id: str = Field(default_factory=_id, primary_key=True)
+    test_session_id: str = Field(foreign_key="testsession.id")
+    quiz_id: str = Field(foreign_key="quiz.id")
+    answer: str        # option id for MC, "true"/"false" for T/F
+    is_correct: bool
+    xp_earned: int = Field(default=0)
+    answered_at: datetime = Field(default_factory=datetime.utcnow)

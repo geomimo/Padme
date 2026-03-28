@@ -6,6 +6,11 @@ import type {
   Lesson,
   Progress,
   QuizAdmin,
+  TestCompleteResponse,
+  TestPlan,
+  TestPlanDetail,
+  TestSessionDetail,
+  TestSessionHistory,
   TokenResponse,
   User,
 } from "@/types";
@@ -121,4 +126,44 @@ export const dailySetApi = {
 // ---------------------------------------------------------------------------
 export const progressApi = {
   get: () => request<Progress>("/progress"),
+};
+
+// ---------------------------------------------------------------------------
+// Test Plans (admin manages, user reads)
+// ---------------------------------------------------------------------------
+export const testPlansApi = {
+  list: () => request<TestPlan[]>("/test-plans"),
+  get: (id: string) => request<TestPlanDetail>(`/test-plans/${id}`),
+  create: (data: {
+    user_id: string;
+    title: string;
+    description?: string;
+    status?: string;
+    quiz_ids: string[];
+  }) => request<TestPlanDetail>("/test-plans", { method: "POST", body: JSON.stringify(data) }),
+  update: (
+    id: string,
+    data: { title?: string; description?: string; status?: string; quiz_ids?: string[] }
+  ) => request<TestPlanDetail>(`/test-plans/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id: string) => request<void>(`/test-plans/${id}`, { method: "DELETE" }),
+
+  // Sessions
+  startSession: (planId: string) =>
+    request<TestSessionDetail>(`/test-plans/${planId}/sessions`, { method: "POST" }),
+  listSessions: (planId: string) =>
+    request<TestSessionHistory[]>(`/test-plans/${planId}/sessions`),
+};
+
+// ---------------------------------------------------------------------------
+// Test Sessions
+// ---------------------------------------------------------------------------
+export const testSessionsApi = {
+  get: (sessionId: string) => request<TestSessionDetail>(`/test-sessions/${sessionId}`),
+  submitAnswer: (sessionId: string, quizId: string, answer: string) =>
+    request<AnswerResponse>(`/test-sessions/${sessionId}/answer`, {
+      method: "POST",
+      body: JSON.stringify({ quiz_id: quizId, answer }),
+    }),
+  complete: (sessionId: string) =>
+    request<TestCompleteResponse>(`/test-sessions/${sessionId}/complete`, { method: "POST" }),
 };

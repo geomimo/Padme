@@ -7,7 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from .admin import create_admin
 from .database import create_db_and_tables
-from .routers import auth, categories, daily_set, lessons, progress, quizzes, users
+from .routers import auth, categories, daily_set, lessons, progress, quizzes, test_plans, users
 
 load_dotenv()
 
@@ -37,6 +37,8 @@ app.include_router(lessons.router)
 app.include_router(quizzes.router)
 app.include_router(daily_set.router)
 app.include_router(progress.router)
+app.include_router(test_plans.router)
+app.include_router(test_plans.sessions_router)
 
 # SQLAdmin panel
 create_admin(app)
