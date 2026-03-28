@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/dashboard", icon: "🏠", label: "Dashboard" },
   { href: "/learn", icon: "📚", label: "Learn" },
+  { href: "/my-tests", icon: "📋", label: "My Tests" },
   { href: "/profile", icon: "👤", label: "Profile" },
 ];
 
@@ -66,13 +67,27 @@ export function AppSidebar({ user }: { user: User }) {
           </Link>
         ))}
         {user.role === "admin" && (
-          <a
-            href="/admin"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm text-purple-600 hover:bg-purple-50 transition-colors"
-          >
-            <span className="text-lg">⚙️</span>
-            Admin Panel
-          </a>
+          <>
+            <Link
+              href="/test-plans"
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-colors",
+                pathname === "/test-plans" || pathname.startsWith("/test-plans/")
+                  ? "bg-purple-500 text-white shadow-[0_2px_0_#7c3aed]"
+                  : "text-purple-600 hover:bg-purple-50"
+              )}
+            >
+              <span className="text-lg">🗂️</span>
+              Test Plans
+            </Link>
+            <a
+              href="/admin"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm text-purple-600 hover:bg-purple-50 transition-colors"
+            >
+              <span className="text-lg">⚙️</span>
+              Admin Panel
+            </a>
+          </>
         )}
       </nav>
 

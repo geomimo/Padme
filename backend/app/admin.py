@@ -13,6 +13,10 @@ from .models import (
     Lesson,
     Quiz,
     QuizOption,
+    TestPlan,
+    TestPlanItem,
+    TestSession,
+    TestSessionAnswer,
     User,
     UserAnswer,
     UserProgress,
@@ -110,6 +114,38 @@ class UserProgressAdmin(ModelView, model=UserProgress):
     icon = "fa-solid fa-chart-bar"
 
 
+class TestPlanAdmin(ModelView, model=TestPlan):
+    column_list = [TestPlan.title, TestPlan.user_id, TestPlan.admin_id, TestPlan.status, TestPlan.created_at]
+    column_searchable_list = [TestPlan.title]
+    column_sortable_list = [TestPlan.created_at, TestPlan.status]
+    name = "Test Plan"
+    name_plural = "Test Plans"
+    icon = "fa-solid fa-clipboard-list"
+
+
+class TestPlanItemAdmin(ModelView, model=TestPlanItem):
+    column_list = [TestPlanItem.test_plan_id, TestPlanItem.quiz_id, TestPlanItem.order]
+    name = "Test Plan Item"
+    name_plural = "Test Plan Items"
+    icon = "fa-solid fa-list-check"
+
+
+class TestSessionAdmin(ModelView, model=TestSession):
+    column_list = [TestSession.test_plan_id, TestSession.user_id, TestSession.status, TestSession.correct_count, TestSession.total_count, TestSession.xp_earned, TestSession.started_at]
+    column_sortable_list = [TestSession.started_at]
+    name = "Test Session"
+    name_plural = "Test Sessions"
+    icon = "fa-solid fa-stopwatch"
+
+
+class TestSessionAnswerAdmin(ModelView, model=TestSessionAnswer):
+    column_list = [TestSessionAnswer.test_session_id, TestSessionAnswer.quiz_id, TestSessionAnswer.is_correct, TestSessionAnswer.xp_earned, TestSessionAnswer.answered_at]
+    column_sortable_list = [TestSessionAnswer.answered_at]
+    name = "Test Session Answer"
+    name_plural = "Test Session Answers"
+    icon = "fa-solid fa-pen-to-square"
+
+
 def create_admin(app) -> Admin:
     secret = os.getenv("ADMIN_SECRET", "change-me")
     authentication_backend = AdminAuth(secret_key=secret)
@@ -123,5 +159,9 @@ def create_admin(app) -> Admin:
     admin.add_view(DailySetAdmin)
     admin.add_view(UserAnswerAdmin)
     admin.add_view(UserProgressAdmin)
+    admin.add_view(TestPlanAdmin)
+    admin.add_view(TestPlanItemAdmin)
+    admin.add_view(TestSessionAdmin)
+    admin.add_view(TestSessionAnswerAdmin)
 
     return admin

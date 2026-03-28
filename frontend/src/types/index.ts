@@ -105,6 +105,67 @@ export interface DayActivity {
   completed: boolean;
 }
 
+export interface TestPlanItem {
+  id: string;
+  quiz_id: string;
+  order: number;
+  question: string;
+  type: string;
+  xp_reward: number;
+}
+
+export interface TestPlan {
+  id: string;
+  admin_id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  status: "draft" | "active" | "archived";
+  item_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TestPlanDetail extends TestPlan {
+  items: TestPlanItem[];
+}
+
+export interface TestSessionAnswer {
+  quiz_id: string;
+  answer: string;
+  is_correct: boolean;
+  xp_earned: number;
+  answered_at: string;
+}
+
+export interface TestSession {
+  id: string;
+  test_plan_id: string;
+  user_id: string;
+  status: "in_progress" | "completed";
+  xp_earned: number;
+  correct_count: number;
+  total_count: number;
+  started_at: string;
+  completed_at: string | null;
+}
+
+export interface TestSessionDetail extends TestSession {
+  plan_title: string;
+  quizzes: QuizPublic[];
+}
+
+export interface TestSessionHistory extends TestSession {
+  answers: TestSessionAnswer[];
+}
+
+export interface TestCompleteResponse {
+  xp_earned: number;
+  correct_count: number;
+  total_count: number;
+  perfect: boolean;
+}
+
 export interface Progress {
   xp: number;
   streak: number;
