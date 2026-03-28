@@ -1,11 +1,20 @@
 import type {
+  Achievement,
   AnswerResponse,
+  BookmarkedQuiz,
   Category,
   CompleteResponse,
   DailySet,
+  LeaderboardEntry,
+  LearningPath,
   Lesson,
+  OnboardingQuiz,
   Progress,
   QuizAdmin,
+  ReviewAnswerResponse,
+  ReviewCompleteResponse,
+  ReviewSession,
+  SessionHistoryItem,
   TokenResponse,
   User,
 } from "@/types";
@@ -91,7 +100,7 @@ export const quizzesApi = {
 };
 
 // ---------------------------------------------------------------------------
-// Users (admin)
+// Users (admin + self-service)
 // ---------------------------------------------------------------------------
 export const usersApi = {
   list: () => request<User[]>("/users"),
@@ -100,6 +109,8 @@ export const usersApi = {
   update: (id: string, data: Partial<{ name: string; role: string; is_active: boolean }>) =>
     request<User>(`/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => request<void>(`/users/${id}`, { method: "DELETE" }),
+  useStreakFreeze: () =>
+    request<User>("/users/me/use-streak-freeze", { method: "POST" }),
 };
 
 // ---------------------------------------------------------------------------
@@ -121,4 +132,68 @@ export const dailySetApi = {
 // ---------------------------------------------------------------------------
 export const progressApi = {
   get: () => request<Progress>("/progress"),
+};
+
+// ---------------------------------------------------------------------------
+// Review
+// ---------------------------------------------------------------------------
+export const reviewApi = {
+  start: () => request<ReviewSession>("/review/start", { method: "POST" }),
+  get: (sessionId: string) => request<ReviewSession>(`/review/${sessionId}`),
+  submitAnswer: (sessionId: string, quizId: string, answer: string) =>
+    request<ReviewAnswerResponse>(`/review/${sessionId}/answer`, {
+      method: "POST",
+      body: JSON.stringify({ quiz_id: quizId, answer }),
+    }),
+  complete: (sessionId: string) =>
+    request<ReviewCompleteResponse>(`/review/${sessionId}/complete`, { method: "POST" }),
+};
+
+// ---------------------------------------------------------------------------
+// Achievements
+// ---------------------------------------------------------------------------
+export const achievementsApi = {
+  list: () => request<Achievement[]>("/achievements"),
+};
+
+// ---------------------------------------------------------------------------
+// Leaderboard
+// ---------------------------------------------------------------------------
+export const leaderboardApi = {
+  get: () => request<LeaderboardEntry[]>("/leaderboard"),
+};
+
+// ---------------------------------------------------------------------------
+// History
+// ---------------------------------------------------------------------------
+export const historyApi = {
+  get: () => request<SessionHistoryItem[]>("/history"),
+};
+
+// ---------------------------------------------------------------------------
+// Bookmarks
+// ---------------------------------------------------------------------------
+export const bookmarksApi = {
+  list: () => request<BookmarkedQuiz[]>("/bookmarks"),
+  add: (quizId: string) =>
+    request<BookmarkedQuiz>("/bookmarks", {
+      method: "POST",
+      body: JSON.stringify({ quiz_id: quizId }),
+    }),
+  remove: (quizId: string) => request<void>(`/bookmarks/${quizId}`, { method: "DELETE" }),
+};
+
+// ---------------------------------------------------------------------------
+// Learning Paths
+// ---------------------------------------------------------------------------
+export const pathsApi = {
+  list: () => request<LearningPath[]>("/paths"),
+};
+
+// ---------------------------------------------------------------------------
+// Onboarding
+// ---------------------------------------------------------------------------
+export const onboardingApi = {
+  getQuiz: () => request<OnboardingQuiz[]>("/onboarding/quiz"),
+  complete: () => request<void>("/onboarding/complete", { method: "POST" }),
 };

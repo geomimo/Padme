@@ -1,43 +1,40 @@
 import { create } from "zustand";
-import type { AnswerResponse, CompleteResponse, QuizPublic } from "@/types";
+import type { ReviewAnswerResponse, ReviewQuizPublic } from "@/types";
 
-interface QuizAnswer {
+interface ReviewAnswer {
   quizId: string;
   answer: string;
   isCorrect: boolean;
-  xpEarned: number;
-  correctOptionId: string | null;
   explanation: string | null;
   detail: string | null;
+  correctOptionId: string | null;
 }
 
 type SessionState = "idle" | "answering" | "feedback" | "complete";
 
-interface QuizSessionStore {
-  dailySetId: string | null;
-  quizzes: QuizPublic[];
+interface ReviewSessionStore {
+  sessionId: string | null;
+  quizzes: ReviewQuizPublic[];
   currentIndex: number;
-  answers: QuizAnswer[];
+  answers: ReviewAnswer[];
   sessionState: SessionState;
-  completionResult: CompleteResponse | null;
 
-  init: (dailySetId: string, quizzes: QuizPublic[]) => void;
-  recordAnswer: (quizId: string, answer: string, response: AnswerResponse) => void;
+  init: (sessionId: string, quizzes: ReviewQuizPublic[]) => void;
+  recordAnswer: (quizId: string, answer: string, response: ReviewAnswerResponse) => void;
   advance: () => void;
-  setComplete: (result: CompleteResponse) => void;
+  markComplete: () => void;
   reset: () => void;
 }
 
-export const useQuizSession = create<QuizSessionStore>((set, get) => ({
-  dailySetId: null,
+export const useReviewSession = create<ReviewSessionStore>((set, get) => ({
+  sessionId: null,
   quizzes: [],
   currentIndex: 0,
   answers: [],
   sessionState: "idle",
-  completionResult: null,
 
-  init: (dailySetId, quizzes) =>
-    set({ dailySetId, quizzes, currentIndex: 0, answers: [], sessionState: "answering", completionResult: null }),
+  init: (sessionId, quizzes) =>
+    set({ sessionId, quizzes, currentIndex: 0, answers: [], sessionState: "answering" }),
 
   recordAnswer: (quizId, answer, response) =>
     set((s) => ({
@@ -47,10 +44,9 @@ export const useQuizSession = create<QuizSessionStore>((set, get) => ({
           quizId,
           answer,
           isCorrect: response.is_correct,
-          xpEarned: response.xp_earned,
-          correctOptionId: response.correct_option_id,
           explanation: response.explanation,
           detail: response.detail,
+          correctOptionId: response.correct_option_id,
         },
       ],
       sessionState: "feedback",
@@ -65,15 +61,14 @@ export const useQuizSession = create<QuizSessionStore>((set, get) => ({
       return { currentIndex: next, sessionState: "answering" };
     }),
 
-  setComplete: (result) => set({ completionResult: result }),
+  markComplete: () => set({ sessionState: "complete" }),
 
   reset: () =>
     set({
-      dailySetId: null,
+      sessionId: null,
       quizzes: [],
       currentIndex: 0,
       answers: [],
       sessionState: "idle",
-      completionResult: null,
     }),
 }));

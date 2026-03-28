@@ -16,7 +16,9 @@ from ..models import (
     UserAnswer,
     UserProgress,
 )
+from ..services.achievements import check_and_award
 from ..services.daily_set import get_or_create_daily_set
+from ..services.srs import update_srs_state
 from ..services.streak import update_streak
 from ..services.xp import xp_for_answer, xp_for_set
 
@@ -38,6 +40,7 @@ class QuizPublic(BaseModel):
     type: str
     question: str
     xp_reward: int
+    difficulty: str
     order: int
     options: list[OptionPublic]
 
@@ -58,8 +61,15 @@ class AnswerRequest(BaseModel):
 class AnswerResponse(BaseModel):
     is_correct: bool
     explanation: Optional[str]
+    detail: Optional[str]
     xp_earned: int
-    correct_option_id: Optional[str] = None  # for MC: reveal correct answer after submission
+    correct_option_id: Optional[str] = None
+
+
+class NewAchievement(BaseModel):
+    key: str
+    name: str
+    icon: str
 
 
 class CompleteResponse(BaseModel):
@@ -70,6 +80,7 @@ class CompleteResponse(BaseModel):
     perfect_set: bool
     correct_count: int
     total_count: int
+    newly_earned_achievements: list[NewAchievement] = []
 
 
 # ---------------------------------------------------------------------------
@@ -93,10 +104,14 @@ def _load_quizzes(daily_set_id: str, session: Session) -> list[QuizPublic]:
             .where(QuizOption.quiz_id == quiz.id)
             .order_by(QuizOption.order)
         ).all()
-        # Strip is_correct from options
         quizzes.append(
             QuizPublic(
-                **quiz.model_dump(exclude={"explanation", "lesson_id", "created_at"}),
+                id=quiz.id,
+                type=quiz.type,
+                question=quiz.question,
+                xp_reward=quiz.xp_reward,
+                difficulty=quiz.difficulty,
+                order=quiz.order,
                 options=[OptionPublic(id=o.id, text=o.text, order=o.order) for o in opts],
             )
         )
@@ -132,7 +147,6 @@ def submit_answer(
     if daily_set.is_completed:
         raise HTTPException(status_code=400, detail="Daily set already completed")
 
-    # Verify quiz belongs to this daily set
     item = session.exec(
         select(DailySetItem).where(
             DailySetItem.daily_set_id == daily_set_id,
@@ -146,7 +160,6 @@ def submit_answer(
     if not quiz:
         raise HTTPException(status_code=404, detail="Quiz not found")
 
-    # Determine correctness server-side
     is_correct = False
     correct_option_id: Optional[str] = None
 
@@ -157,7 +170,7 @@ def submit_answer(
         if correct_opt:
             correct_option_id = correct_opt.id
             is_correct = body.answer.lower() == correct_opt.text.lower()
-    else:  # MULTIPLE_CHOICE
+    else:
         chosen_opt = session.get(QuizOption, body.answer)
         if chosen_opt and chosen_opt.quiz_id == quiz.id:
             is_correct = chosen_opt.is_correct
@@ -199,6 +212,7 @@ def submit_answer(
     return AnswerResponse(
         is_correct=is_correct,
         explanation=quiz.explanation,
+        detail=quiz.detail,
         xp_earned=xp,
         correct_option_id=correct_option_id,
     )
@@ -214,7 +228,6 @@ def complete_set(
     if not daily_set or daily_set.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Daily set not found")
 
-    # Idempotency: already completed
     if daily_set.is_completed:
         return CompleteResponse(
             xp_earned=daily_set.xp_earned,
@@ -224,9 +237,9 @@ def complete_set(
             perfect_set=False,
             correct_count=0,
             total_count=0,
+            newly_earned_achievements=[],
         )
 
-    # Count correct answers for this set
     items = session.exec(
         select(DailySetItem).where(DailySetItem.daily_set_id == daily_set_id)
     ).all()
@@ -253,8 +266,10 @@ def complete_set(
     daily_set.completed_at = datetime.utcnow()
     session.add(daily_set)
 
-    # Award XP
+    # Award XP & streak freeze milestone (every 7-day streak = +1 freeze, max 3)
     current_user.xp += xp
+    if current_user.streak > 0 and current_user.streak % 7 == 0 and current_user.streak_freezes < 3:
+        current_user.streak_freezes += 1
     session.add(current_user)
 
     # Update UserProgress per lesson
@@ -279,6 +294,14 @@ def complete_set(
     session.commit()
     session.refresh(current_user)
 
+    # Update SRS states for all answered quizzes
+    for answer in answers:
+        update_srs_state(current_user.id, answer.quiz_id, answer.is_correct, session)
+    session.commit()
+
+    # Check and award achievements
+    newly_earned = check_and_award(current_user, session, perfect_set=perfect)
+
     return CompleteResponse(
         xp_earned=xp,
         new_total_xp=current_user.xp,
@@ -287,4 +310,7 @@ def complete_set(
         perfect_set=perfect,
         correct_count=correct_count,
         total_count=total_count,
+        newly_earned_achievements=[
+            NewAchievement(key=a.key, name=a.name, icon=a.icon) for a in newly_earned
+        ],
     )
