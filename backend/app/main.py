@@ -7,13 +7,29 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from .admin import create_admin
 from .database import create_db_and_tables
-from .routers import auth, categories, daily_set, lessons, progress, quizzes, test_plans, users
+from .routers import (
+    achievements,
+    auth,
+    bookmarks,
+    categories,
+    daily_set,
+    history,
+    leaderboard,
+    lessons,
+    onboarding,
+    paths,
+    progress,
+    quizzes,
+    review,
+    test_plans,
+    users,
+)
 
 load_dotenv()
 
 app = FastAPI(
     title="Padme — Databricks Learning API",
-    version="1.0.0",
+    version="2.0.0",
     description="Duolingo-style quiz platform for learning Databricks.",
 )
 
@@ -29,7 +45,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
+# Core routers
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(categories.router)
@@ -39,6 +55,15 @@ app.include_router(daily_set.router)
 app.include_router(progress.router)
 app.include_router(test_plans.router)
 app.include_router(test_plans.sessions_router)
+
+# New feature routers
+app.include_router(review.router)
+app.include_router(achievements.router)
+app.include_router(leaderboard.router)
+app.include_router(history.router)
+app.include_router(bookmarks.router)
+app.include_router(paths.router)
+app.include_router(onboarding.router)
 
 # SQLAdmin panel
 create_admin(app)

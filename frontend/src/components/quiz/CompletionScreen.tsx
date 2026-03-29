@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { CompleteResponse } from "@/types";
 import { Button } from "@/components/ui/button";
 
@@ -16,12 +16,12 @@ export function CompletionScreen({ result }: { result: CompleteResponse }) {
   }, [result.correct_count]);
 
   return (
-    <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6 z-50">
+    <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6 z-50 overflow-y-auto">
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="max-w-sm w-full text-center space-y-6"
+        className="max-w-sm w-full text-center space-y-6 py-8"
       >
         <div className="text-7xl">{result.perfect_set ? "🏆" : result.correct_count > 0 ? "🎉" : "😤"}</div>
 
@@ -57,6 +57,29 @@ export function CompletionScreen({ result }: { result: CompleteResponse }) {
             className="bg-yellow-100 text-yellow-800 font-bold rounded-2xl px-4 py-3 text-sm"
           >
             🌟 Perfect set bonus! +20 XP
+          </motion.div>
+        )}
+
+        {/* Newly earned achievements */}
+        {result.newly_earned_achievements.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="space-y-2"
+          >
+            <p className="text-sm font-bold text-gray-700">🏅 Achievement{result.newly_earned_achievements.length > 1 ? "s" : ""} unlocked!</p>
+            {result.newly_earned_achievements.map((ach) => (
+              <div
+                key={ach.key}
+                className="flex items-center gap-3 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl px-4 py-3"
+              >
+                <span className="text-2xl">{ach.icon}</span>
+                <div className="text-left">
+                  <div className="font-bold text-gray-900 text-sm">{ach.name}</div>
+                </div>
+              </div>
+            ))}
           </motion.div>
         )}
 

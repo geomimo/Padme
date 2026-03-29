@@ -1,4 +1,5 @@
-"""User management — admin only."""
+"""User management — admin only + self-service streak freeze."""
+from datetime import date, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -7,7 +8,7 @@ from sqlmodel import Session, select
 
 from ..auth import hash_password
 from ..database import get_session
-from ..dependencies import require_admin
+from ..dependencies import get_current_user, require_admin
 from ..models import User
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -35,14 +36,14 @@ class UserOut(BaseModel):
     streak: int
     longest_streak: int
     last_active_date: Optional[str]
+    streak_freezes: int
+    onboarding_complete: bool
     is_active: bool
     created_at: str
 
     @classmethod
     def from_user(cls, u: User) -> "UserOut":
-        return cls(
-            **{**u.model_dump(), "created_at": u.created_at.isoformat()}
-        )
+        return cls(**{**u.model_dump(), "created_at": u.created_at.isoformat()})
 
 
 @router.get("", response_model=list[UserOut])
@@ -113,3 +114,32 @@ def delete_user(
         raise HTTPException(status_code=404, detail="User not found")
     session.delete(user)
     session.commit()
+
+
+# ---------------------------------------------------------------------------
+# Self-service: streak freeze
+# ---------------------------------------------------------------------------
+
+@router.post("/me/use-streak-freeze", response_model=UserOut)
+def use_streak_freeze(
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """Use one streak freeze to prevent streak reset on a missed day."""
+    if current_user.streak_freezes <= 0:
+        raise HTTPException(status_code=400, detail="No streak freezes available")
+
+    # Only applicable if streak is at risk (last_active_date is yesterday or earlier)
+    today = date.today().isoformat()
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+
+    if current_user.last_active_date == today:
+        raise HTTPException(status_code=400, detail="Streak is not at risk today")
+
+    # Set last_active_date to yesterday so the next set completion will continue the streak
+    current_user.last_active_date = yesterday
+    current_user.streak_freezes -= 1
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+    return UserOut.from_user(current_user)
