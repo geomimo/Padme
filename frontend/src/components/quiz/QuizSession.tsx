@@ -268,7 +268,7 @@ export function QuizSession({ dailySet }: { dailySet: DailySet }) {
         <AnswerFeedback
           isCorrect={lastAnswer.isCorrect}
           explanation={lastAnswer.explanation}
-          detail={(lastAnswer as { detail?: string | null }).detail ?? null}
+          detail={lastAnswer.detail}
           xpEarned={lastAnswer.xpEarned}
           onContinue={handleContinue}
         />

@@ -1,6 +1,6 @@
 """Daily set creation with SRS-based quiz selection."""
 import random
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from sqlmodel import Session, select
 
@@ -10,6 +10,7 @@ from ..models import (
     Lesson,
     Quiz,
     QuizSRSState,
+    UserAnswer,
 )
 
 DAILY_SET_SIZE = 5
@@ -47,6 +48,19 @@ def get_or_create_daily_set(user_id: str, session: Session) -> DailySet:
         session.refresh(daily_set)
         return daily_set
 
+    # Exclude quizzes answered correctly in the last 7 days when enough fresh ones exist
+    cutoff = datetime.utcnow() - timedelta(days=7)
+    recently_correct_ids = set(session.exec(
+        select(UserAnswer.quiz_id).where(
+            UserAnswer.user_id == user_id,
+            UserAnswer.is_correct == True,  # noqa: E712
+            UserAnswer.answered_at >= cutoff,
+        )
+    ).all())
+
+    fresh_quizzes = [q for q in all_quizzes if q.id not in recently_correct_ids]
+    pool = fresh_quizzes if len(fresh_quizzes) >= DAILY_SET_SIZE else all_quizzes
+
     # SRS-based selection: due > new > not yet due
     srs_states = {
         s.quiz_id: s
@@ -59,7 +73,7 @@ def get_or_create_daily_set(user_id: str, session: Session) -> DailySet:
     new_quizzes: list[Quiz] = []
     not_due: list[Quiz] = []
 
-    for q in all_quizzes:
+    for q in pool:
         state = srs_states.get(q.id)
         if state is None:
             new_quizzes.append(q)
@@ -77,8 +91,8 @@ def get_or_create_daily_set(user_id: str, session: Session) -> DailySet:
     selected = prioritized[:DAILY_SET_SIZE]
 
     # Pad if pool is smaller than target
-    if len(selected) < DAILY_SET_SIZE and len(all_quizzes) > len(selected):
-        extras = [q for q in all_quizzes if q not in selected]
+    if len(selected) < DAILY_SET_SIZE and len(pool) > len(selected):
+        extras = [q for q in pool if q not in selected]
         selected += random.sample(extras, min(DAILY_SET_SIZE - len(selected), len(extras)))
 
     daily_set = DailySet(user_id=user_id, date=today)
