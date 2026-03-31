@@ -8,6 +8,7 @@ interface QuizAnswer {
   xpEarned: number;
   correctOptionId: string | null;
   explanation: string | null;
+  detail: string | null;
 }
 
 type SessionState = "idle" | "answering" | "feedback" | "complete";
@@ -49,6 +50,7 @@ export const useQuizSession = create<QuizSessionStore>((set, get) => ({
           xpEarned: response.xp_earned,
           correctOptionId: response.correct_option_id,
           explanation: response.explanation,
+          detail: response.detail,
         },
       ],
       sessionState: "feedback",

@@ -111,6 +111,7 @@ class AnswerRequest(BaseModel):
 class AnswerResponse(BaseModel):
     is_correct: bool
     explanation: Optional[str]
+    detail: Optional[str] = None
     xp_earned: int
     correct_option_id: Optional[str] = None
 
@@ -507,6 +508,7 @@ def submit_answer(
     return AnswerResponse(
         is_correct=is_correct,
         explanation=quiz.explanation,
+        detail=quiz.detail,
         xp_earned=xp,
         correct_option_id=correct_option_id,
     )

@@ -26,6 +26,7 @@ class QuizIn(BaseModel):
     type: str          # "MULTIPLE_CHOICE" | "TRUE_FALSE"
     question: str
     explanation: Optional[str] = None
+    detail: Optional[str] = None
     xp_reward: int = 10
     order: int = 0
     options: list[OptionIn]
@@ -48,6 +49,7 @@ class QuizOut(BaseModel):
     type: str
     question: str
     explanation: Optional[str]
+    detail: Optional[str]
     xp_reward: int
     order: int
     options: list[OptionOut]

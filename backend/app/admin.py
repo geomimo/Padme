@@ -8,17 +8,24 @@ from starlette.responses import RedirectResponse
 from .auth import verify_password
 from .database import engine
 from .models import (
+    Achievement,
     Category,
     DailySet,
     Lesson,
+    LearningPath,
+    LearningPathItem,
     Quiz,
     QuizOption,
+    QuizSRSState,
+    ReviewSession,
     TestPlan,
     TestPlanItem,
     TestSession,
     TestSessionAnswer,
     User,
+    UserAchievement,
     UserAnswer,
+    UserBookmark,
     UserProgress,
 )
 
@@ -29,7 +36,6 @@ class AdminAuth(AuthenticationBackend):
         email = str(form.get("username", ""))
         password = str(form.get("password", ""))
 
-        # Import here to avoid circular issues
         from sqlmodel import Session, select
         with Session(engine) as session:
             user = session.exec(select(User).where(User.email == email)).first()
@@ -51,7 +57,7 @@ class AdminAuth(AuthenticationBackend):
 # ---------------------------------------------------------------------------
 
 class UserAdmin(ModelView, model=User):
-    column_list = [User.email, User.name, User.role, User.xp, User.streak, User.is_active, User.created_at]
+    column_list = [User.email, User.name, User.role, User.xp, User.streak, User.streak_freezes, User.is_active]
     column_searchable_list = [User.email, User.name]
     column_sortable_list = [User.xp, User.streak, User.created_at]
     name = "User"
@@ -68,7 +74,7 @@ class CategoryAdmin(ModelView, model=Category):
 
 
 class LessonAdmin(ModelView, model=Lesson):
-    column_list = [Lesson.title, Lesson.category_id, Lesson.order, Lesson.is_published, Lesson.created_at]
+    column_list = [Lesson.title, Lesson.category_id, Lesson.order, Lesson.is_published]
     column_searchable_list = [Lesson.title]
     column_sortable_list = [Lesson.order, Lesson.created_at]
     name = "Lesson"
@@ -77,7 +83,7 @@ class LessonAdmin(ModelView, model=Lesson):
 
 
 class QuizAdmin(ModelView, model=Quiz):
-    column_list = [Quiz.question, Quiz.type, Quiz.lesson_id, Quiz.xp_reward, Quiz.order]
+    column_list = [Quiz.question, Quiz.type, Quiz.difficulty, Quiz.lesson_id, Quiz.xp_reward]
     column_searchable_list = [Quiz.question]
     name = "Quiz"
     name_plural = "Quizzes"
@@ -146,6 +152,55 @@ class TestSessionAnswerAdmin(ModelView, model=TestSessionAnswer):
     icon = "fa-solid fa-pen-to-square"
 
 
+class AchievementAdmin(ModelView, model=Achievement):
+    column_list = [Achievement.key, Achievement.name, Achievement.icon]
+    name = "Achievement"
+    name_plural = "Achievements"
+    icon = "fa-solid fa-trophy"
+
+
+class UserAchievementAdmin(ModelView, model=UserAchievement):
+    column_list = [UserAchievement.user_id, UserAchievement.achievement_id, UserAchievement.earned_at]
+    name = "User Achievement"
+    name_plural = "User Achievements"
+    icon = "fa-solid fa-medal"
+
+
+class UserBookmarkAdmin(ModelView, model=UserBookmark):
+    column_list = [UserBookmark.user_id, UserBookmark.quiz_id, UserBookmark.created_at]
+    name = "Bookmark"
+    name_plural = "Bookmarks"
+    icon = "fa-solid fa-bookmark"
+
+
+class LearningPathAdmin(ModelView, model=LearningPath):
+    column_list = [LearningPath.title, LearningPath.order, LearningPath.is_published]
+    name = "Learning Path"
+    name_plural = "Learning Paths"
+    icon = "fa-solid fa-road"
+
+
+class LearningPathItemAdmin(ModelView, model=LearningPathItem):
+    column_list = [LearningPathItem.path_id, LearningPathItem.lesson_id, LearningPathItem.order]
+    name = "Path Item"
+    name_plural = "Path Items"
+    icon = "fa-solid fa-list-ol"
+
+
+class ReviewSessionAdmin(ModelView, model=ReviewSession):
+    column_list = [ReviewSession.user_id, ReviewSession.is_completed, ReviewSession.correct_count, ReviewSession.total_count]
+    name = "Review Session"
+    name_plural = "Review Sessions"
+    icon = "fa-solid fa-rotate"
+
+
+class QuizSRSStateAdmin(ModelView, model=QuizSRSState):
+    column_list = [QuizSRSState.user_id, QuizSRSState.quiz_id, QuizSRSState.interval, QuizSRSState.next_review, QuizSRSState.ease_factor]
+    name = "SRS State"
+    name_plural = "SRS States"
+    icon = "fa-solid fa-brain"
+
+
 def create_admin(app) -> Admin:
     secret = os.getenv("ADMIN_SECRET", "change-me")
     authentication_backend = AdminAuth(secret_key=secret)
@@ -163,5 +218,12 @@ def create_admin(app) -> Admin:
     admin.add_view(TestPlanItemAdmin)
     admin.add_view(TestSessionAdmin)
     admin.add_view(TestSessionAnswerAdmin)
+    admin.add_view(AchievementAdmin)
+    admin.add_view(UserAchievementAdmin)
+    admin.add_view(UserBookmarkAdmin)
+    admin.add_view(LearningPathAdmin)
+    admin.add_view(LearningPathItemAdmin)
+    admin.add_view(ReviewSessionAdmin)
+    admin.add_view(QuizSRSStateAdmin)
 
     return admin

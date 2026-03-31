@@ -18,6 +18,7 @@ interface QuizAnswer {
   xpEarned: number;
   correctOptionId: string | null;
   explanation: string | null;
+  detail: string | null;
 }
 
 export default function TestSessionPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -74,6 +75,7 @@ export default function TestSessionPage({ params }: { params: Promise<{ sessionI
             xpEarned: resp.xp_earned,
             correctOptionId: resp.correct_option_id,
             explanation: resp.explanation,
+            detail: resp.detail,
           },
         ]);
         setState("feedback");
@@ -218,6 +220,7 @@ export default function TestSessionPage({ params }: { params: Promise<{ sessionI
         <AnswerFeedback
           isCorrect={lastAnswer.isCorrect}
           explanation={lastAnswer.explanation}
+          detail={lastAnswer.detail}
           xpEarned={lastAnswer.xpEarned}
           onContinue={handleContinue}
         />
