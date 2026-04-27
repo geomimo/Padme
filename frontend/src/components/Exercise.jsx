@@ -1,6 +1,6 @@
 import styles from './Exercise.module.css'
 
-export default function Exercise({ exercise, answer, onAnswer }) {
+export default function Exercise({ exercise, answer, onAnswer, disabled }) {
   if (exercise.type === 'multiple_choice') {
     return (
       <div className={styles.exercise}>
@@ -10,7 +10,8 @@ export default function Exercise({ exercise, answer, onAnswer }) {
             <button
               key={idx}
               className={`${styles.option} ${answer === String(idx) ? styles.selected : ''}`}
-              onClick={() => onAnswer(String(idx))}
+              onClick={() => !disabled && onAnswer(String(idx))}
+              disabled={disabled}
             >
               <span className={styles.letter}>{String.fromCharCode(65 + idx)}</span>
               {option}
@@ -32,6 +33,7 @@ export default function Exercise({ exercise, answer, onAnswer }) {
           onChange={e => onAnswer(e.target.value)}
           placeholder="Type your answer..."
           autoFocus
+          disabled={disabled}
         />
       </div>
     )

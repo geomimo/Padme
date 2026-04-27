@@ -6,7 +6,6 @@ from datetime import date, datetime
 bp = Blueprint("lessons", __name__, url_prefix="/api/lessons")
 
 def strip_answers(exercise):
-    """Remove correct_answer from exercise before sending to frontend"""
     ex = dict(exercise)
     ex.pop("correct_answer", None)
     return ex
@@ -41,6 +40,46 @@ def get_lesson(lesson_id):
     result = dict(lesson)
     result["exercises"] = [strip_answers(ex) for ex in lesson["exercises"]]
     return jsonify(result)
+
+@bp.route("/<lesson_id>/check", methods=["POST"])
+def check_answer(lesson_id):
+    data = request.json
+    user_id = data.get("user_id")
+    exercise_id = data.get("exercise_id")
+    user_answer = (data.get("answer") or "").strip()
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    lesson = LESSONS.get(lesson_id)
+    if not lesson:
+        return jsonify({"error": "Lesson not found"}), 404
+
+    exercise = next((ex for ex in lesson["exercises"] if ex["id"] == exercise_id), None)
+    if not exercise:
+        return jsonify({"error": "Exercise not found"}), 404
+
+    correct_answer = exercise["correct_answer"]
+    if exercise["type"] == "multiple_choice":
+        is_correct = user_answer == str(correct_answer)
+    elif exercise["type"] == "fill_blank":
+        is_correct = user_answer.lower() == str(correct_answer).lower()
+    else:
+        is_correct = False
+
+    explanation = exercise["explanation_correct"] if is_correct else exercise["explanation_wrong"]
+
+    db.session.add(UserAnswer(
+        user_id=user_id,
+        lesson_id=lesson_id,
+        exercise_id=exercise_id,
+        answer=user_answer,
+        is_correct=is_correct,
+    ))
+    db.session.commit()
+
+    return jsonify({"correct": is_correct, "explanation": explanation})
 
 @bp.route("/<lesson_id>/complete", methods=["POST"])
 def complete_lesson(lesson_id):
@@ -78,16 +117,8 @@ def complete_lesson(lesson_id):
             "correct": is_correct,
             "user_answer": user_answer,
             "correct_answer": str(correct_answer),
+            "explanation": exercise["explanation_correct"],
         }
-
-        answer_record = UserAnswer(
-            user_id=user_id,
-            lesson_id=lesson_id,
-            exercise_id=ex_id,
-            answer=user_answer,
-            is_correct=is_correct,
-        )
-        db.session.add(answer_record)
 
     xp_earned = lesson["xp_reward"] + (5 * score)
 

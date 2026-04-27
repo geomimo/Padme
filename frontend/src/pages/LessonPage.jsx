@@ -3,105 +3,161 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import Navbar from '../components/Navbar'
 import Exercise from '../components/Exercise'
+import FeedbackPanel from '../components/FeedbackPanel'
 import styles from './LessonPage.module.css'
 
+// phase: 'question' | 'feedback' | 'results'
 export default function LessonPage() {
   const { lessonId } = useParams()
   const navigate = useNavigate()
   const { user, setUser } = useUser()
+
   const [lesson, setLesson] = useState(null)
-  const [currentExercise, setCurrentExercise] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [submitted, setSubmitted] = useState(false)
+  const [phase, setPhase] = useState('question')
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentAnswer, setCurrentAnswer] = useState('')
+  const [answers, setAnswers] = useState({})   // accumulated correct answers for /complete
+  const [feedback, setFeedback] = useState(null)
   const [result, setResult] = useState(null)
+  const [isChecking, setIsChecking] = useState(false)
+  const [isCompleting, setIsCompleting] = useState(false)
 
   useEffect(() => {
-    const load = async () => {
-      const res = await fetch(`/api/lessons/${lessonId}`)
-      setLesson(await res.json())
-    }
-    load()
+    fetch(`/api/lessons/${lessonId}`)
+      .then(r => r.json())
+      .then(setLesson)
   }, [lessonId])
 
-  const handleAnswer = (exerciseId, answer) => {
-    setAnswers(prev => ({ ...prev, [exerciseId]: answer }))
-  }
+  if (!lesson) return <div className={styles.loading}>Loading...</div>
 
-  const handleSubmit = async () => {
-    const res = await fetch(`/api/lessons/${lessonId}/complete`, {
+  const exercises = lesson.exercises
+  const exercise = exercises[currentIndex]
+  const progress = ((currentIndex) / exercises.length) * 100
+
+  const handleCheck = async () => {
+    if (!currentAnswer) return
+    setIsChecking(true)
+
+    const res = await fetch(`/api/lessons/${lessonId}/check`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id, answers })
+      body: JSON.stringify({ user_id: user.id, exercise_id: exercise.id, answer: currentAnswer }),
     })
     const data = await res.json()
+    setIsChecking(false)
+    setFeedback(data)
+    setPhase('feedback')
 
-    setResult(data)
-    setSubmitted(true)
-
-    setUser(prev => ({ ...prev, xp: data.total_xp, streak: data.streak }))
+    if (data.correct) {
+      setAnswers(prev => ({ ...prev, [exercise.id]: currentAnswer }))
+    }
   }
 
-  if (!lesson) return <div>Loading...</div>
+  const handleContinue = async () => {
+    if (!feedback.correct) {
+      // Wrong — retry same question
+      setCurrentAnswer('')
+      setFeedback(null)
+      setPhase('question')
+      return
+    }
 
-  if (submitted && result) {
+    const isLast = currentIndex === exercises.length - 1
+    if (isLast) {
+      // All done — call /complete
+      setIsCompleting(true)
+      const finalAnswers = { ...answers, [exercise.id]: currentAnswer }
+      const res = await fetch(`/api/lessons/${lessonId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id, answers: finalAnswers }),
+      })
+      const data = await res.json()
+      setResult(data)
+      setUser(prev => ({ ...prev, xp: data.total_xp, streak: data.streak }))
+      setPhase('results')
+    } else {
+      setCurrentIndex(i => i + 1)
+      setCurrentAnswer('')
+      setFeedback(null)
+      setPhase('question')
+    }
+  }
+
+  if (phase === 'results' && result) {
+    const concepts = result.results
+      ? Object.values(result.results).map(r => r.explanation).filter(Boolean)
+      : []
+
     return (
       <div className={styles.container}>
         <Navbar />
         <main className={styles.main}>
           <div className={styles.results}>
-            <h1>Lesson Complete! 🎉</h1>
-            <div className={styles.score}>
-              <div className={styles.scoreCircle}>
-                <span className={styles.scoreText}>{result.score}/{result.total}</span>
-              </div>
+            <div className={styles.scoreCircle}>
+              <span className={styles.scoreText}>{result.score}/{result.total}</span>
             </div>
-            <p>+{result.xp_earned} XP</p>
-            <p>Streak: {result.streak} 🔥</p>
-            <button onClick={() => navigate(-1)}>← Back</button>
+            <h1 className={styles.resultsTitle}>Lesson Complete!</h1>
+            <p className={styles.xpLine}>+{result.xp_earned} XP &nbsp;·&nbsp; {result.streak} day streak 🔥</p>
+
+            {concepts.length > 0 && (
+              <div className={styles.concepts}>
+                <h2>Concepts covered</h2>
+                <ul>
+                  {concepts.map((c, i) => <li key={i}>{c}</li>)}
+                </ul>
+              </div>
+            )}
+
+            <button onClick={() => navigate(-1)}>← Back to lessons</button>
           </div>
         </main>
       </div>
     )
   }
 
-  const exercise = lesson.exercises[currentExercise]
-  const isLast = currentExercise === lesson.exercises.length - 1
-
   return (
     <div className={styles.container}>
       <Navbar />
       <main className={styles.main}>
+        <div className={styles.progressBar}>
+          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+        </div>
+
         <div className={styles.header}>
           <h1>{lesson.title}</h1>
-          <p className={styles.progress}>
-            Question {currentExercise + 1} of {lesson.exercises.length}
+          <p className={styles.progressText}>
+            {currentIndex + 1} / {exercises.length}
           </p>
         </div>
 
         <div className={styles.exerciseContainer}>
           <Exercise
             exercise={exercise}
-            answer={answers[exercise.id] || ''}
-            onAnswer={answer => handleAnswer(exercise.id, answer)}
+            answer={currentAnswer}
+            onAnswer={setCurrentAnswer}
+            disabled={phase === 'feedback'}
           />
         </div>
 
-        <div className={styles.controls}>
-          {currentExercise > 0 && (
-            <button onClick={() => setCurrentExercise(currentExercise - 1)}>
-              ← Previous
+        {phase === 'feedback' && feedback ? (
+          <FeedbackPanel
+            correct={feedback.correct}
+            explanation={feedback.explanation}
+            onContinue={handleContinue}
+            loading={isCompleting}
+          />
+        ) : (
+          <div className={styles.controls}>
+            <button
+              className={styles.checkBtn}
+              onClick={handleCheck}
+              disabled={!currentAnswer || isChecking}
+            >
+              {isChecking ? 'Checking...' : 'Check'}
             </button>
-          )}
-          {!isLast ? (
-            <button onClick={() => setCurrentExercise(currentExercise + 1)}>
-              Next →
-            </button>
-          ) : (
-            <button onClick={handleSubmit} className={styles.submit}>
-              Submit
-            </button>
-          )}
-        </div>
+          </div>
+        )}
       </main>
     </div>
   )

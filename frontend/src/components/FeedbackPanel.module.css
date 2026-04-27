@@ -1,0 +1,75 @@
+.panel {
+  border-radius: 12px;
+  border: 2px solid;
+  padding: 24px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.correct {
+  background-color: rgba(0, 197, 90, 0.08);
+  border-color: var(--success);
+}
+
+.wrong {
+  background-color: rgba(255, 54, 33, 0.08);
+  border-color: var(--primary);
+}
+
+.icon {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.correct .icon { color: var(--success); }
+.wrong .icon   { color: var(--primary); }
+
+.label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.correct .label { color: var(--success); }
+.wrong .label   { color: var(--primary); }
+
+.explanation {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 500px;
+}
+
+.btn {
+  margin-top: 8px;
+  padding: 10px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.btn:hover { opacity: 0.85; }
+
+.correct .btn {
+  background-color: var(--success);
+  color: #fff;
+}
+
+.wrong .btn {
+  background-color: var(--primary);
+  color: #fff;
+}
