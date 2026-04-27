@@ -1,0 +1,44 @@
+[
+  {
+    "id": "spark",
+    "title": "Spark Fundamentals",
+    "description": "Learn Apache Spark basics and data processing",
+    "icon": "⚡",
+    "lesson_ids": [
+      "spark_intro",
+      "spark_dataframes",
+      "spark_ops"
+    ]
+  },
+  {
+    "id": "delta",
+    "title": "Delta Lake",
+    "description": "Master ACID transactions and data reliability",
+    "icon": "🏔️",
+    "lesson_ids": [
+      "delta_intro",
+      "delta_acid",
+      "delta_timetravel"
+    ]
+  },
+  {
+    "id": "mlflow",
+    "title": "MLflow",
+    "description": "Track and manage machine learning models",
+    "icon": "🎛️",
+    "lesson_ids": [
+      "mlflow_tracking",
+      "mlflow_registry"
+    ]
+  },
+  {
+    "id": "unity",
+    "title": "Unity Catalog",
+    "description": "Govern data and AI assets across your platform",
+    "icon": "📚",
+    "lesson_ids": [
+      "unity_intro",
+      "unity_namespace"
+    ]
+  }
+]

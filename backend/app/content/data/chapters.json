@@ -1,0 +1,52 @@
+[
+  {
+    "id": "ch_spark",
+    "title": "Spark Foundations",
+    "description": "Master the core of distributed computing",
+    "icon": "⚡",
+    "lesson_ids": [
+      "spark_intro",
+      "spark_dataframes",
+      "spark_ops"
+    ],
+    "boss_lesson_id": "spark_boss",
+    "order": 1
+  },
+  {
+    "id": "ch_delta",
+    "title": "Delta Lake",
+    "description": "ACID transactions and reliable data lakes",
+    "icon": "🏔️",
+    "lesson_ids": [
+      "delta_intro",
+      "delta_acid",
+      "delta_timetravel"
+    ],
+    "boss_lesson_id": "delta_boss",
+    "order": 2
+  },
+  {
+    "id": "ch_mlflow",
+    "title": "MLflow",
+    "description": "Track and manage ML experiments",
+    "icon": "🎛️",
+    "lesson_ids": [
+      "mlflow_tracking",
+      "mlflow_registry"
+    ],
+    "boss_lesson_id": "mlflow_boss",
+    "order": 3
+  },
+  {
+    "id": "ch_unity",
+    "title": "Unity Catalog",
+    "description": "Govern data and AI across your platform",
+    "icon": "📚",
+    "lesson_ids": [
+      "unity_intro",
+      "unity_namespace"
+    ],
+    "boss_lesson_id": "unity_boss",
+    "order": 4
+  }
+]

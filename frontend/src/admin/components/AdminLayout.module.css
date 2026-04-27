@@ -1,0 +1,18 @@
+.shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.content {
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+}

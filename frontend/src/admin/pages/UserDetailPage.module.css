@@ -1,0 +1,186 @@
+.loading {
+  color: var(--text-secondary);
+  padding: 2rem 0;
+}
+
+.back {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0;
+  margin-bottom: 1.25rem;
+  transition: color 0.15s;
+}
+
+.back:hover {
+  color: var(--text);
+}
+
+.heading {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 0.25rem;
+}
+
+.uid {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+.statsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 110px;
+}
+
+.statVal {
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.section {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.section.danger {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+  color: var(--text);
+}
+
+.editGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input {
+  padding: 0.55rem 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+.saveBtn {
+  padding: 0.6rem 1.4rem;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: var(--surface-2);
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.badgeDate {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
+
+.dangerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dangerRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dangerDesc {
+  margin: 0.2rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.dangerBtn {
+  padding: 0.5rem 1.1rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #f87171;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.dangerBtn:hover {
+  background: rgba(239, 68, 68, 0.22);
+}

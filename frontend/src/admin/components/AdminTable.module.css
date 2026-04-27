@@ -1,0 +1,54 @@
+.wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.th {
+  background: var(--surface);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+}
+
+.tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.12s;
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background: var(--surface-2);
+}
+
+.td {
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.empty {
+  color: var(--text-secondary);
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+}

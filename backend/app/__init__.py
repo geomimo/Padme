@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from .models import db
-from .routes import users, topics, lessons, journey, paths, leaderboard
+from .routes import users, topics, lessons, journey, paths, leaderboard, admin
 from config import config
 
 def create_app(config_name="development"):
@@ -20,5 +20,6 @@ def create_app(config_name="development"):
     app.register_blueprint(journey.bp)
     app.register_blueprint(paths.bp)
     app.register_blueprint(leaderboard.bp)
+    app.register_blueprint(admin.bp)
 
     return app

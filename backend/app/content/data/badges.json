@@ -1,0 +1,62 @@
+[
+  {
+    "id": "streak_7",
+    "name": "Week Warrior",
+    "description": "7-day streak",
+    "icon": "🔥"
+  },
+  {
+    "id": "streak_30",
+    "name": "Monthly Devotee",
+    "description": "30-day streak",
+    "icon": "📅"
+  },
+  {
+    "id": "streak_100",
+    "name": "Century Streak",
+    "description": "100-day streak",
+    "icon": "💯"
+  },
+  {
+    "id": "perfect_lesson",
+    "name": "No Mistakes",
+    "description": "Complete a lesson with no wrong answers",
+    "icon": "⭐"
+  },
+  {
+    "id": "topic_spark",
+    "name": "Spark Master",
+    "description": "≥80% on all Spark lessons",
+    "icon": "⚡"
+  },
+  {
+    "id": "topic_delta",
+    "name": "Delta Expert",
+    "description": "≥80% on all Delta lessons",
+    "icon": "🔺"
+  },
+  {
+    "id": "topic_mlflow",
+    "name": "ML Practitioner",
+    "description": "≥80% on all MLflow lessons",
+    "icon": "🧪"
+  },
+  {
+    "id": "topic_unity",
+    "name": "Unity Champion",
+    "description": "≥80% on all Unity lessons",
+    "icon": "🏰"
+  },
+  {
+    "id": "comeback",
+    "name": "Back in Business",
+    "description": "Returned after a 7+ day gap",
+    "icon": "🔄"
+  },
+  {
+    "id": "path_complete",
+    "name": "Path Graduate",
+    "description": "Completed a learning path",
+    "icon": "🎓"
+  }
+]

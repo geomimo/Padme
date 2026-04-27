@@ -1,0 +1,234 @@
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.heading {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.newBtn {
+  padding: 0.6rem 1.2rem;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: opacity 0.15s;
+}
+
+.newBtn:hover {
+  opacity: 0.85;
+}
+
+.actionBtn {
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.actionBtn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.deleteBtn {
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 6px;
+  color: #f87171;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Form page styles */
+.back {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0;
+  margin-bottom: 1.25rem;
+  transition: color 0.15s;
+}
+
+.back:hover {
+  color: var(--text);
+}
+
+.form {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1.75rem;
+  max-width: 720px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input,
+.textarea,
+.select {
+  padding: 0.6rem 0.85rem;
+  background: var(--surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+  border-color: var(--primary);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.codeTextarea {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  min-height: 120px;
+}
+
+.submitRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.submitBtn {
+  padding: 0.65rem 1.5rem;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  padding: 0.65rem 1.25rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cancelBtn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.error {
+  color: #f87171;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1rem;
+  color: var(--text);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 1.25rem;
+}
+
+.addBtn {
+  padding: 0.5rem 1rem;
+  background: var(--surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.addBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.iconPreview {
+  font-size: 1.5rem;
+  padding-top: 0.2rem;
+}
+
+.loading {
+  color: var(--text-secondary);
+  padding: 2rem 0;
+}

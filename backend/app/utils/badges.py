@@ -1,13 +1,9 @@
 from ..content.badges import BADGES_BY_ID
-from ..content.lessons import TOPICS
-
-# Map topic badge id → topic lesson_ids
-_TOPIC_LESSON_IDS = {
-    f"topic_{t['id']}": t["lesson_ids"] for t in TOPICS
-}
+from ..content import store as _store
 
 
 def evaluate_badges(user, all_progress, earned_ids, *, lesson_perfect=False, gap_days=None):
+    topic_lesson_ids = {f"topic_{t['id']}": t["lesson_ids"] for t in _store.TOPICS}
     """Return list of badge ids newly earned in this session.
 
     Args:
@@ -42,7 +38,7 @@ def evaluate_badges(user, all_progress, earned_ids, *, lesson_perfect=False, gap
         award("comeback")
 
     # Topic mastery — all lessons in a topic at ≥ 80%
-    for badge_id, lesson_ids in _TOPIC_LESSON_IDS.items():
+    for badge_id, lesson_ids in topic_lesson_ids.items():
         if badge_id in earned_ids:
             continue
         if not lesson_ids:
