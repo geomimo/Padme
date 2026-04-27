@@ -7,6 +7,8 @@ import LessonPage from './pages/LessonPage'
 import ProfilePage from './pages/ProfilePage'
 import OnboardingPage from './pages/OnboardingPage'
 import PlacementQuizPage from './pages/PlacementQuizPage'
+import PathsPage from './pages/PathsPage'
+import PathDetailPage from './pages/PathDetailPage'
 
 const ONBOARDING_ENABLED = import.meta.env.VITE_ONBOARDING_ENABLED === 'true'
 
@@ -37,6 +39,8 @@ export default function App() {
           <Route path="/topic/:topicId" element={<RequireUser><TopicPage /></RequireUser>} />
           <Route path="/lesson/:lessonId" element={<RequireUser><LessonPage /></RequireUser>} />
           <Route path="/profile" element={<RequireUser><ProfilePage /></RequireUser>} />
+          <Route path="/paths" element={<RequireUser><PathsPage /></RequireUser>} />
+          <Route path="/paths/:pathId" element={<RequireUser><PathDetailPage /></RequireUser>} />
         </Routes>
       </UserProvider>
     </Router>

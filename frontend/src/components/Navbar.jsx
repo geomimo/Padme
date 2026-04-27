@@ -25,9 +25,12 @@ export default function Navbar() {
         >
           Topics
         </NavLink>
-        <span className={`${styles.link} ${styles.disabled}`} title="Coming soon">
+        <NavLink
+          to="/paths"
+          className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}
+        >
           Paths
-        </span>
+        </NavLink>
         <NavLink
           to="/profile"
           className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}

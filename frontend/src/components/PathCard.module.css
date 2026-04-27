@@ -1,0 +1,172 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--surface-2);
+  border-radius: 14px;
+  padding: 20px;
+  transition: border-color 0.15s, transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card[role="button"] {
+  cursor: pointer;
+}
+
+.card[role="button"]:hover {
+  border-color: rgba(255, 54, 33, 0.35);
+  transform: translateY(-2px);
+}
+
+.completed {
+  border-color: rgba(0, 197, 90, 0.3);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(0, 197, 90, 0.04) 100%);
+}
+
+.completedBadge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--success, #00c55a);
+  background: rgba(0, 197, 90, 0.12);
+  border: 1px solid rgba(0, 197, 90, 0.3);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.header {
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--text-primary, #fff);
+  padding-right: 90px; /* space for completed badge */
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.certTag {
+  background: rgba(255, 200, 0, 0.1);
+  color: #ffc800;
+  border: 1px solid rgba(255, 200, 0, 0.25);
+  text-transform: capitalize;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 10px 0 14px;
+}
+
+.progressSection {
+  margin-bottom: 14px;
+}
+
+.progressRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.progressLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.progressPct {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.progressTrack {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.progressFillDone {
+  background: var(--success, #00c55a);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.enrollBtn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.enrollBtn:hover:not(:disabled) { opacity: 0.85; }
+.enrollBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.continueBtn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: rgba(255, 54, 33, 0.12);
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 54, 33, 0.3);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.continueBtn:hover { background: rgba(255, 54, 33, 0.2); }
+
+.unenrollBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--surface-2);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.unenrollBtn:hover:not(:disabled) {
+  border-color: rgba(255, 54, 33, 0.4);
+  color: var(--primary);
+}

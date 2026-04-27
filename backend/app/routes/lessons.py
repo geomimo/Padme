@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from ..content.lessons import LESSONS, TOPICS
 from ..content.badges import BADGES_BY_ID
-from ..models import db, User, UserProgress, UserAnswer, UserBadge
+from ..content.paths import PATHS
+from ..models import db, User, UserProgress, UserAnswer, UserBadge, UserPath
 from ..utils.badges import evaluate_badges
 from datetime import date, datetime
 
@@ -191,6 +192,21 @@ def complete_lesson(lesson_id):
     )
     for badge_id in newly_earned:
         db.session.add(UserBadge(user_id=user_id, badge_id=badge_id))
+
+    db.session.commit()
+
+    # Path completion check
+    completed_lesson_ids = {p.lesson_id for p in all_progress}
+    enrolled_paths = UserPath.query.filter_by(user_id=user_id, completed_at=None).all()
+    for up in enrolled_paths:
+        path_def = next((p for p in PATHS if p["id"] == up.path_id), None)
+        if path_def and all(lid in completed_lesson_ids for lid in path_def["lesson_ids"]):
+            up.completed_at = datetime.utcnow()
+            # Award path_complete badge if not already earned
+            if "path_complete" not in earned_ids and "path_complete" in BADGES_BY_ID:
+                db.session.add(UserBadge(user_id=user_id, badge_id="path_complete"))
+                newly_earned.append("path_complete")
+                earned_ids.add("path_complete")
 
     db.session.commit()
 

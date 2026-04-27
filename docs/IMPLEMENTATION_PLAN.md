@@ -29,7 +29,7 @@ For the product narrative see [`../CLAUDE.md`](../CLAUDE.md) (Product Vision sec
 | Onboarding flow — opt-in via `VITE_ONBOARDING_ENABLED` (Phase 4) | **Done** |
 | Daily goal + streak shield (Phase 5) | **Done** |
 | Badges & achievements (Phase 6) | **Done** |
-| Learning paths (Phase 7) | Not built |
+| Learning paths (Phase 7) | **Done** |
 | New question types — code reading, match, order (Phase 8) | Not built |
 | Weekly leaderboard (Phase 9) | Not built |
 | Shareable public profile (Phase 10) | Not built |
