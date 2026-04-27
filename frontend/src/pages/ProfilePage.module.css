@@ -1,0 +1,54 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+.main {
+  flex: 1;
+  padding: 40px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.back {
+  color: var(--primary);
+  text-decoration: none;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+.main h1 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.stat {
+  background-color: var(--surface);
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--primary);
+}

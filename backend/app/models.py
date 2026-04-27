@@ -1,0 +1,63 @@
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from uuid import uuid4
+
+db = SQLAlchemy()
+
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    xp = db.Column(db.Integer, default=0)
+    streak = db.Column(db.Integer, default=0)
+    last_active_date = db.Column(db.Date, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    progress = db.relationship("UserProgress", back_populates="user", cascade="all, delete-orphan")
+    answers = db.relationship("UserAnswer", back_populates="user", cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "xp": self.xp,
+            "streak": self.streak,
+            "last_active_date": self.last_active_date.isoformat() if self.last_active_date else None,
+            "created_at": self.created_at.isoformat(),
+        }
+
+class UserProgress(db.Model):
+    __tablename__ = "user_progress"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    lesson_id = db.Column(db.String(100), nullable=False)
+    score = db.Column(db.Integer, default=0)
+    total = db.Column(db.Integer, default=0)
+    xp_earned = db.Column(db.Integer, default=0)
+    completed_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", back_populates="progress")
+
+    __table_args__ = (db.UniqueConstraint("user_id", "lesson_id", name="unique_user_lesson"),)
+
+    def to_dict(self):
+        return {
+            "lesson_id": self.lesson_id,
+            "score": self.score,
+            "total": self.total,
+            "xp_earned": self.xp_earned,
+            "completed_at": self.completed_at.isoformat(),
+        }
+
+class UserAnswer(db.Model):
+    __tablename__ = "user_answers"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    lesson_id = db.Column(db.String(100), nullable=False)
+    exercise_id = db.Column(db.String(100), nullable=False)
+    answer = db.Column(db.String(500), nullable=False)
+    is_correct = db.Column(db.Boolean, default=False)
+    answered_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", back_populates="answers")

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git merge:*)",
+      "Bash(docker compose:*)",
+      "Bash(git rm *)",
+      "Bash(git clean *)",
+      "PowerShell(Get-ChildItem -Force | Where-Object {$_.Name -ne '.git'} | Remove-Item -Recurse -Force; ls -Force)",
+      "Bash(git push *)"
+    ]
+  }
+}
