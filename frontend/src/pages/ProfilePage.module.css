@@ -83,11 +83,85 @@
   color: var(--text-primary, #fff);
 }
 
+/* Daily goal card */
+.goalCard {
+  background-color: var(--surface);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid var(--surface-2);
+}
+
+.goalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.goalTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+
+.goalCount {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.progressFillGoal {
+  background: var(--success, #00c55a) !important;
+}
+
+.shieldNote {
+  font-size: 0.8rem;
+  color: var(--success, #00c55a);
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.goalPresets {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.presetBtn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--surface-2);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+}
+
+.presetBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.presetActive {
+  border-color: var(--primary) !important;
+  background: rgba(255, 54, 33, 0.1) !important;
+  color: var(--primary) !important;
+}
+
+.presetBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Stats grid */
 .stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .stat {

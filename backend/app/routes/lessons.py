@@ -142,10 +142,31 @@ def complete_lesson(lesson_id):
     user.xp += xp_delta
 
     today = date.today()
+
+    # Daily XP tracking — reset counter on a new day
+    if user.daily_xp_date != today:
+        user.daily_xp_today = 0
+        user.daily_xp_date = today
+    prev_daily = user.daily_xp_today
+    user.daily_xp_today += xp_delta
+
+    # Grant a streak shield when daily goal is hit for the first time today
+    if prev_daily < user.daily_goal_xp <= user.daily_xp_today:
+        today_iso = today.isocalendar()
+        current_week = today_iso[0] * 100 + today_iso[1]
+        if user.shield_granted_week != current_week:
+            user.streak_shields += 1
+            user.shield_granted_week = current_week
+
+    # Streak — a shield absorbs exactly one missed day (gap of 2)
     if user.last_active_date is None:
         user.streak = 1
     elif user.last_active_date != today:
-        if (today - user.last_active_date).days == 1:
+        days_gap = (today - user.last_active_date).days
+        if days_gap == 1:
+            user.streak += 1
+        elif days_gap == 2 and user.streak_shields > 0:
+            user.streak_shields -= 1
             user.streak += 1
         else:
             user.streak = 1
@@ -159,5 +180,8 @@ def complete_lesson(lesson_id):
         "xp_earned": xp_earned,
         "streak": user.streak,
         "total_xp": user.xp,
+        "streak_shields": user.streak_shields,
+        "daily_xp_today": user.daily_xp_today,
+        "daily_goal_xp": user.daily_goal_xp,
         "results": results,
     })

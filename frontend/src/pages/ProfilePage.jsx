@@ -1,15 +1,41 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { getLevelForXP, getNextLevel, xpProgressToNextLevel } from '../config/levels'
 import Navbar from '../components/Navbar'
 import styles from './ProfilePage.module.css'
 
+const GOAL_PRESETS = [
+  { label: 'Light', xp: 10 },
+  { label: 'Regular', xp: 30 },
+  { label: 'Intense', xp: 80 },
+]
+
 export default function ProfilePage() {
-  const { user } = useUser()
+  const { user, setUser, refreshUser } = useUser()
+  const [savingGoal, setSavingGoal] = useState(false)
+
   const xp = user?.xp ?? 0
   const level = getLevelForXP(xp)
   const nextLevel = getNextLevel(xp)
   const progress = xpProgressToNextLevel(xp)
+
+  const dailyXp = user?.daily_xp_today ?? 0
+  const dailyGoal = user?.daily_goal_xp ?? 30
+  const shields = user?.streak_shields ?? 0
+  const dailyProgress = Math.min(dailyXp / dailyGoal, 1)
+
+  const handleGoalChange = async (newGoal) => {
+    if (savingGoal || newGoal === dailyGoal) return
+    setSavingGoal(true)
+    await fetch(`/api/users/${user.id}/settings`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ daily_goal_xp: newGoal }),
+    })
+    setUser(prev => ({ ...prev, daily_goal_xp: newGoal }))
+    setSavingGoal(false)
+  }
 
   return (
     <div className={styles.container}>
@@ -36,6 +62,36 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        <div className={styles.goalCard}>
+          <div className={styles.goalHeader}>
+            <span className={styles.goalTitle}>Daily Goal</span>
+            <span className={styles.goalCount}>{dailyXp} / {dailyGoal} XP</span>
+          </div>
+          <div className={styles.progressTrack}>
+            <div
+              className={`${styles.progressFill} ${dailyProgress >= 1 ? styles.progressFillGoal : ''}`}
+              style={{ width: `${dailyProgress * 100}%` }}
+            />
+          </div>
+          {shields > 0 && (
+            <div className={styles.shieldNote}>
+              🛡️ {shields} streak shield{shields > 1 ? 's' : ''} — absorbs a missed day
+            </div>
+          )}
+          <div className={styles.goalPresets}>
+            {GOAL_PRESETS.map(p => (
+              <button
+                key={p.xp}
+                className={`${styles.presetBtn} ${dailyGoal === p.xp ? styles.presetActive : ''}`}
+                onClick={() => handleGoalChange(p.xp)}
+                disabled={savingGoal}
+              >
+                {p.label} · {p.xp} XP
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className={styles.stats}>
           <div className={styles.stat}>
             <span className={styles.label}>XP</span>
@@ -44,6 +100,10 @@ export default function ProfilePage() {
           <div className={styles.stat}>
             <span className={styles.label}>Streak</span>
             <span className={styles.value}>{user?.streak || 0} 🔥</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.label}>Shields</span>
+            <span className={styles.value}>{shields} 🛡️</span>
           </div>
         </div>
       </main>

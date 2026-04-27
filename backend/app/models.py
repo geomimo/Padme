@@ -12,6 +12,11 @@ class User(db.Model):
     streak = db.Column(db.Integer, default=0)
     last_active_date = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    daily_goal_xp = db.Column(db.Integer, default=30)
+    streak_shields = db.Column(db.Integer, default=0)
+    daily_xp_today = db.Column(db.Integer, default=0)
+    daily_xp_date = db.Column(db.Date, nullable=True)
+    shield_granted_week = db.Column(db.Integer, nullable=True)
 
     progress = db.relationship("UserProgress", back_populates="user", cascade="all, delete-orphan")
     answers = db.relationship("UserAnswer", back_populates="user", cascade="all, delete-orphan")

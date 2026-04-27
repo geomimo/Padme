@@ -45,4 +45,24 @@ def get_user(user_id):
     result["level_name"] = level["name"]
     result["level_icon"] = level["icon"]
     result["xp_to_next_level"] = _xp_to_next_level(user.xp)
+    result["daily_goal_xp"] = user.daily_goal_xp
+    result["daily_xp_today"] = user.daily_xp_today if user.daily_xp_date == date.today() else 0
+    result["streak_shields"] = user.streak_shields
     return jsonify(result)
+
+
+@bp.route("/<user_id>/settings", methods=["PATCH"])
+def update_settings(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.json or {}
+    if "daily_goal_xp" in data:
+        goal = int(data["daily_goal_xp"])
+        if goal < 1:
+            return jsonify({"error": "daily_goal_xp must be positive"}), 400
+        user.daily_goal_xp = goal
+
+    db.session.commit()
+    return jsonify({"ok": True, "daily_goal_xp": user.daily_goal_xp})

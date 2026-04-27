@@ -79,7 +79,14 @@ export default function LessonPage() {
       if (newLevel.min > prevLevel.min) setLevelUp(newLevel)
 
       setResult(data)
-      setUser(prev => ({ ...prev, xp: data.total_xp, streak: data.streak }))
+      setUser(prev => ({
+        ...prev,
+        xp: data.total_xp,
+        streak: data.streak,
+        streak_shields: data.streak_shields ?? prev.streak_shields,
+        daily_xp_today: data.daily_xp_today ?? prev.daily_xp_today,
+        daily_goal_xp: data.daily_goal_xp ?? prev.daily_goal_xp,
+      }))
       setPhase('results')
     } else {
       setCurrentIndex(i => i + 1)

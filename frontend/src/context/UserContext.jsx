@@ -39,8 +39,13 @@ export function UserProvider({ children }) {
     await loadUser(userId)
   }, [loadUser])
 
+  const refreshUser = useCallback(async () => {
+    const userId = localStorage.getItem('user_id')
+    if (userId) await loadUser(userId)
+  }, [loadUser])
+
   return (
-    <UserContext.Provider value={{ user, setUser, loading, initUser }}>
+    <UserContext.Provider value={{ user, setUser, loading, initUser, refreshUser }}>
       {children}
     </UserContext.Provider>
   )

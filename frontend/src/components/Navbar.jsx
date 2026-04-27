@@ -39,7 +39,14 @@ export default function Navbar() {
       <div className={styles.stats}>
         <span className={styles.level}>{level.icon} {level.name}</span>
         <span>{xp} XP</span>
-        <span>{user?.streak ?? 0} 🔥</span>
+        <span className={styles.streakStat}>
+          {user?.streak ?? 0} 🔥
+          {(user?.streak_shields ?? 0) > 0 && (
+            <span className={styles.shieldBadge} title={`${user.streak_shields} streak shield${user.streak_shields > 1 ? 's' : ''}`}>
+              🛡️{user.streak_shields}
+            </span>
+          )}
+        </span>
       </div>
     </nav>
   )

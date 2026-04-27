@@ -73,3 +73,20 @@
   border-radius: 20px;
   white-space: nowrap;
 }
+
+.streakStat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shieldBadge {
+  font-size: 0.75rem;
+  background: rgba(0, 197, 90, 0.15);
+  color: var(--success, #00c55a);
+  border: 1px solid rgba(0, 197, 90, 0.3);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  cursor: default;
+}
