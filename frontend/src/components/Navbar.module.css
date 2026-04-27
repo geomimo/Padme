@@ -1,32 +1,63 @@
 .nav {
   background-color: var(--surface);
-  padding: 15px 30px;
+  padding: 0 24px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 24px;
   border-bottom: 1px solid var(--surface-2);
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 800;
   color: var(--primary);
   text-decoration: none;
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.link {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s, background-color 0.15s;
+  cursor: pointer;
+}
+
+.link:hover:not(.disabled) {
+  color: var(--text-primary, #fff);
+  background-color: var(--surface-2);
+}
+
+.link.active {
+  color: var(--primary);
+  background-color: rgba(255, 54, 33, 0.1);
+}
+
+.link.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .stats {
   display: flex;
-  gap: 20px;
-  font-size: 0.9rem;
+  gap: 16px;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   font-family: var(--font-mono);
-}
-
-.nav a {
-  color: var(--primary);
-  text-decoration: none;
-}
-
-.nav a:hover {
-  opacity: 0.8;
+  flex-shrink: 0;
 }

@@ -29,6 +29,45 @@ TOPICS = [
     },
 ]
 
+CHAPTERS = [
+    {
+        "id": "ch_spark",
+        "title": "Spark Foundations",
+        "description": "Master the core of distributed computing",
+        "icon": "⚡",
+        "lesson_ids": ["spark_intro", "spark_dataframes", "spark_ops"],
+        "boss_lesson_id": "spark_boss",
+        "order": 1,
+    },
+    {
+        "id": "ch_delta",
+        "title": "Delta Lake",
+        "description": "ACID transactions and reliable data lakes",
+        "icon": "🏔️",
+        "lesson_ids": ["delta_intro", "delta_acid", "delta_timetravel"],
+        "boss_lesson_id": "delta_boss",
+        "order": 2,
+    },
+    {
+        "id": "ch_mlflow",
+        "title": "MLflow",
+        "description": "Track and manage ML experiments",
+        "icon": "🎛️",
+        "lesson_ids": ["mlflow_tracking", "mlflow_registry"],
+        "boss_lesson_id": "mlflow_boss",
+        "order": 3,
+    },
+    {
+        "id": "ch_unity",
+        "title": "Unity Catalog",
+        "description": "Govern data and AI across your platform",
+        "icon": "📚",
+        "lesson_ids": ["unity_intro", "unity_namespace"],
+        "boss_lesson_id": "unity_boss",
+        "order": 4,
+    },
+]
+
 LESSONS = {
     "spark_intro": {
         "id": "spark_intro",
@@ -36,6 +75,9 @@ LESSONS = {
         "description": "Understand the basics of Apache Spark",
         "xp_reward": 100,
         "topic_id": "spark",
+        "chapter_id": "ch_spark",
+        "order": 1,
+        "boss": False,
         "exercises": [
             {
                 "id": "spark_intro_1",
@@ -81,6 +123,9 @@ LESSONS = {
         "description": "Work with structured data using DataFrames",
         "xp_reward": 100,
         "topic_id": "spark",
+        "chapter_id": "ch_spark",
+        "order": 2,
+        "boss": False,
         "exercises": [
             {
                 "id": "spark_df_1",
@@ -112,6 +157,9 @@ LESSONS = {
         "description": "Master transformations and actions",
         "xp_reward": 100,
         "topic_id": "spark",
+        "chapter_id": "ch_spark",
+        "order": 3,
+        "boss": False,
         "exercises": [
             {
                 "id": "spark_ops_1",
@@ -129,12 +177,127 @@ LESSONS = {
             },
         ],
     },
+    "spark_boss": {
+        "id": "spark_boss",
+        "title": "Spark Boss Challenge",
+        "description": "Prove your Spark mastery",
+        "xp_reward": 250,
+        "topic_id": "spark",
+        "chapter_id": "ch_spark",
+        "order": 4,
+        "boss": True,
+        "exercises": [
+            {
+                "id": "spark_boss_1",
+                "type": "multiple_choice",
+                "question": "In Spark, lazy evaluation means transformations are...",
+                "options": [
+                    "Executed immediately when called",
+                    "Cached automatically in memory",
+                    "Not executed until an action is triggered",
+                    "Run in parallel by default",
+                ],
+                "correct_answer": 2,
+                "explanation_correct": "Lazy evaluation means Spark builds a logical plan of transformations (DAG) but waits for an action like collect() or count() before executing anything.",
+                "explanation_wrong": "Lazy evaluation means transformations are deferred. Spark accumulates them into a DAG and only executes the full pipeline when an action is called.",
+            },
+            {
+                "id": "spark_boss_2",
+                "type": "multiple_choice",
+                "question": "What does calling persist() on a DataFrame do?",
+                "options": [
+                    "Writes the DataFrame to disk permanently",
+                    "Saves the DataFrame in memory/disk for reuse across actions",
+                    "Uploads the DataFrame to DBFS",
+                    "Forces immediate execution of all transformations",
+                ],
+                "correct_answer": 1,
+                "explanation_correct": "persist() (or cache()) materialises the DataFrame after its first computation and stores it in memory (or disk) so subsequent actions skip recomputation.",
+                "explanation_wrong": "persist() caches the result of a computation in memory or disk for reuse — it doesn't write to permanent storage or force immediate execution.",
+            },
+            {
+                "id": "spark_boss_3",
+                "type": "fill_blank",
+                "question": "Spark represents computation as a Directed Acyclic _______, allowing optimised execution planning.",
+                "correct_answer": "Graph",
+                "explanation_correct": "A DAG (Directed Acyclic Graph) is Spark's internal representation of a computation pipeline — each node is a transformation, each edge is a data dependency.",
+                "explanation_wrong": "The answer is 'Graph'. Spark's DAG scheduler analyses the transformation graph to optimise execution — for example, combining multiple filter steps into one.",
+            },
+            {
+                "id": "spark_boss_4",
+                "type": "multiple_choice",
+                "question": "Which of these is a wide transformation (requires a shuffle)?",
+                "options": [
+                    "filter()",
+                    "map()",
+                    "groupBy()",
+                    "select()",
+                ],
+                "correct_answer": 2,
+                "explanation_correct": "groupBy() is a wide transformation — it needs to move data across partitions (shuffle) to group matching keys together from different nodes.",
+                "explanation_wrong": "filter(), map(), and select() are narrow transformations — each output partition depends on only one input partition, so no shuffle is needed. groupBy() shuffles data.",
+            },
+            {
+                "id": "spark_boss_5",
+                "type": "multiple_choice",
+                "question": "What is a partition in Spark?",
+                "options": [
+                    "A single node in the cluster",
+                    "A chunk of data that can be processed independently on one executor",
+                    "A column in a DataFrame",
+                    "A configuration file for the cluster",
+                ],
+                "correct_answer": 1,
+                "explanation_correct": "A partition is an indivisible chunk of data assigned to one executor. Spark processes partitions in parallel — more partitions means more parallelism (up to a point).",
+                "explanation_wrong": "A partition is a data chunk processed by one executor core. Partitioning determines parallelism: too few partitions underutilise the cluster; too many create scheduling overhead.",
+            },
+            {
+                "id": "spark_boss_6",
+                "type": "fill_blank",
+                "question": "The _______ method reduces the number of partitions without a full shuffle, making it more efficient than repartition() for downsizing.",
+                "correct_answer": "coalesce",
+                "explanation_correct": "coalesce() merges partitions on the same executor without shuffling data across the network, making it cheaper than repartition() when reducing partition count.",
+                "explanation_wrong": "The answer is 'coalesce'. Unlike repartition() which always shuffles, coalesce() combines nearby partitions locally — use it when you need fewer partitions without the shuffle cost.",
+            },
+            {
+                "id": "spark_boss_7",
+                "type": "multiple_choice",
+                "question": "What role does the Driver play in a Spark cluster?",
+                "options": [
+                    "Executes individual task computations",
+                    "Stores data partitions in memory",
+                    "Coordinates the cluster — schedules tasks and collects results",
+                    "Manages network I/O between nodes",
+                ],
+                "correct_answer": 2,
+                "explanation_correct": "The Driver is the coordinator — it converts your program into a DAG, breaks it into stages and tasks, schedules tasks on executors, and collects the final result.",
+                "explanation_wrong": "Executors run the actual task computations. The Driver coordinates: it parses your code into a DAG, schedules tasks on executors, and aggregates results.",
+            },
+            {
+                "id": "spark_boss_8",
+                "type": "multiple_choice",
+                "question": "When Spark reads a Parquet file, which optimisation does it apply automatically?",
+                "options": [
+                    "Full table scan on every query",
+                    "Column pruning — reads only columns referenced in the query",
+                    "Automatic caching of all data in memory",
+                    "Converts Parquet to CSV before processing",
+                ],
+                "correct_answer": 1,
+                "explanation_correct": "Parquet is columnar storage, so Spark's Catalyst optimiser applies column pruning — it reads only the columns your query actually uses, dramatically reducing I/O.",
+                "explanation_wrong": "Spark + Parquet apply column pruning: since Parquet stores data by column, Spark skips columns not referenced in your query. This is a major performance advantage over row-based formats.",
+            },
+        ],
+    },
     "delta_intro": {
         "id": "delta_intro",
         "title": "Introduction to Delta Lake",
         "description": "Understand Delta Lake fundamentals",
         "xp_reward": 100,
         "topic_id": "delta",
+        "chapter_id": "ch_delta",
+        "order": 1,
+        "boss": False,
         "exercises": [
             {
                 "id": "delta_intro_1",
@@ -158,6 +321,9 @@ LESSONS = {
         "description": "Learn about ACID transactions",
         "xp_reward": 100,
         "topic_id": "delta",
+        "chapter_id": "ch_delta",
+        "order": 2,
+        "boss": False,
         "exercises": [
             {
                 "id": "delta_acid_1",
@@ -175,6 +341,9 @@ LESSONS = {
         "description": "Query historical data versions",
         "xp_reward": 100,
         "topic_id": "delta",
+        "chapter_id": "ch_delta",
+        "order": 3,
+        "boss": False,
         "exercises": [
             {
                 "id": "delta_tt_1",
@@ -192,12 +361,49 @@ LESSONS = {
             },
         ],
     },
+    "delta_boss": {
+        "id": "delta_boss",
+        "title": "Delta Lake Boss Challenge",
+        "description": "Prove your Delta Lake mastery",
+        "xp_reward": 250,
+        "topic_id": "delta",
+        "chapter_id": "ch_delta",
+        "order": 4,
+        "boss": True,
+        "exercises": [
+            {
+                "id": "delta_boss_1",
+                "type": "multiple_choice",
+                "question": "Where does Delta Lake store its transaction history?",
+                "options": [
+                    "In a separate SQL database",
+                    "In the _delta_log directory alongside the data",
+                    "In Databricks Unity Catalog only",
+                    "In memory on the driver node",
+                ],
+                "correct_answer": 1,
+                "explanation_correct": "Delta Lake stores all transaction metadata in a _delta_log directory (as JSON and Parquet checkpoint files) alongside the data files on object storage.",
+                "explanation_wrong": "The transaction log lives in _delta_log — a special directory in the same storage location as your data. It's just files, so it works on any cloud storage.",
+            },
+            {
+                "id": "delta_boss_2",
+                "type": "fill_blank",
+                "question": "The Delta Lake operation that merges updates, inserts, and deletes in a single statement is called _______.",
+                "correct_answer": "MERGE",
+                "explanation_correct": "MERGE INTO (also called upsert) lets you apply conditional INSERT, UPDATE, and DELETE operations from a source table in one atomic transaction.",
+                "explanation_wrong": "The answer is 'MERGE'. MERGE INTO is one of Delta Lake's most powerful features — it handles upserts and complex multi-condition writes atomically.",
+            },
+        ],
+    },
     "mlflow_tracking": {
         "id": "mlflow_tracking",
         "title": "MLflow Tracking",
         "description": "Track experiments and metrics",
         "xp_reward": 100,
         "topic_id": "mlflow",
+        "chapter_id": "ch_mlflow",
+        "order": 1,
+        "boss": False,
         "exercises": [
             {
                 "id": "mlflow_track_1",
@@ -221,6 +427,9 @@ LESSONS = {
         "description": "Manage model versions and stages",
         "xp_reward": 100,
         "topic_id": "mlflow",
+        "chapter_id": "ch_mlflow",
+        "order": 2,
+        "boss": False,
         "exercises": [
             {
                 "id": "mlflow_reg_1",
@@ -232,12 +441,49 @@ LESSONS = {
             },
         ],
     },
+    "mlflow_boss": {
+        "id": "mlflow_boss",
+        "title": "MLflow Boss Challenge",
+        "description": "Prove your MLflow mastery",
+        "xp_reward": 250,
+        "topic_id": "mlflow",
+        "chapter_id": "ch_mlflow",
+        "order": 3,
+        "boss": True,
+        "exercises": [
+            {
+                "id": "mlflow_boss_1",
+                "type": "multiple_choice",
+                "question": "Which MLflow component logs parameters, metrics, and model artifacts during training?",
+                "options": [
+                    "MLflow Projects",
+                    "MLflow Tracking",
+                    "MLflow Models",
+                    "MLflow Registry",
+                ],
+                "correct_answer": 1,
+                "explanation_correct": "MLflow Tracking is the logging component — you call mlflow.log_param(), mlflow.log_metric(), and mlflow.log_artifact() during a training run.",
+                "explanation_wrong": "MLflow Tracking handles all run-time logging. Projects define reproducible environments, Models define a standard format, and Registry manages versions.",
+            },
+            {
+                "id": "mlflow_boss_2",
+                "type": "fill_blank",
+                "question": "An MLflow _______ groups related runs together, like all experiments for a specific model type.",
+                "correct_answer": "Experiment",
+                "explanation_correct": "An MLflow Experiment is a named container for related runs. You set it with mlflow.set_experiment('my_experiment') before logging runs.",
+                "explanation_wrong": "The answer is 'Experiment'. Experiments group runs — for example, all hyperparameter tuning runs for a RandomForest model would live in one experiment.",
+            },
+        ],
+    },
     "unity_intro": {
         "id": "unity_intro",
         "title": "Unity Catalog Basics",
         "description": "Understand catalog, schema, and tables",
         "xp_reward": 100,
         "topic_id": "unity",
+        "chapter_id": "ch_unity",
+        "order": 1,
+        "boss": False,
         "exercises": [
             {
                 "id": "unity_intro_1",
@@ -261,6 +507,9 @@ LESSONS = {
         "description": "Organize with catalogs and schemas",
         "xp_reward": 100,
         "topic_id": "unity",
+        "chapter_id": "ch_unity",
+        "order": 2,
+        "boss": False,
         "exercises": [
             {
                 "id": "unity_ns_1",
@@ -269,6 +518,40 @@ LESSONS = {
                 "correct_answer": "schema",
                 "explanation_correct": "Unity Catalog uses a three-level namespace: catalog > schema > table. A schema (also called a database) groups related tables within a catalog.",
                 "explanation_wrong": "The answer is 'schema'. The full path to a table in Unity Catalog is catalog.schema.table — for example, main.sales.orders.",
+            },
+        ],
+    },
+    "unity_boss": {
+        "id": "unity_boss",
+        "title": "Unity Catalog Boss Challenge",
+        "description": "Prove your Unity Catalog mastery",
+        "xp_reward": 250,
+        "topic_id": "unity",
+        "chapter_id": "ch_unity",
+        "order": 3,
+        "boss": True,
+        "exercises": [
+            {
+                "id": "unity_boss_1",
+                "type": "multiple_choice",
+                "question": "In Unity Catalog, which level controls access to all assets within it?",
+                "options": [
+                    "Table",
+                    "Schema",
+                    "Catalog",
+                    "Column",
+                ],
+                "correct_answer": 2,
+                "explanation_correct": "The Catalog is the top-level namespace. Permissions granted at the catalog level cascade down to all schemas and tables within it.",
+                "explanation_wrong": "The Catalog is the top of the hierarchy. Granting USE CATALOG on a catalog controls whether users can even see the schemas and tables inside it.",
+            },
+            {
+                "id": "unity_boss_2",
+                "type": "fill_blank",
+                "question": "Unity Catalog tracks data _______ — the complete history of where data came from and how it was transformed.",
+                "correct_answer": "lineage",
+                "explanation_correct": "Data lineage in Unity Catalog automatically records how data flows between tables — which notebook wrote it, which upstream tables it read from.",
+                "explanation_wrong": "The answer is 'lineage'. Unity Catalog's lineage tracking shows the full data journey: source → transformation → destination, across all workspaces.",
             },
         ],
     },

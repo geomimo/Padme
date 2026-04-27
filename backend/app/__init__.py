@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from .models import db
-from .routes import users, topics, lessons
+from .routes import users, topics, lessons, journey
 from config import config
 
 def create_app(config_name="development"):
@@ -17,5 +17,6 @@ def create_app(config_name="development"):
     app.register_blueprint(users.bp)
     app.register_blueprint(topics.bp)
     app.register_blueprint(lessons.bp)
+    app.register_blueprint(journey.bp)
 
     return app

@@ -1,0 +1,140 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+.main {
+  flex: 1;
+  padding: 32px 20px 80px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.pageTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* ── Chapter ── */
+.chapter {
+  margin-bottom: 48px;
+}
+
+.chapterHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background-color: var(--surface);
+  border: 1px solid var(--surface-2);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.chapterLocked {
+  opacity: 0.5;
+}
+
+.chapterIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.chapterTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.chapterDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.lockBadge {
+  margin-left: auto;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* ── Road ── */
+.road {
+  display: flex;
+  flex-direction: column;
+  /* Road is 340px wide, centered */
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.segment {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Node row positions */
+.nodeRow {
+  display: flex;
+}
+
+.nodeRow.right {
+  justify-content: flex-end;
+}
+
+.nodeRow.left {
+  justify-content: flex-start;
+}
+
+.nodeRow.center {
+  justify-content: center;
+}
+
+/* ── Road connectors (Duolingo-style curves) ── */
+/* After a RIGHT node: arc curves down-left (occupies right 55%) */
+.curveRight {
+  height: 56px;
+  width: 55%;
+  align-self: flex-end;
+  border-right: 4px solid var(--surface-2);
+  border-bottom: 4px solid var(--surface-2);
+  border-bottom-right-radius: 48px;
+}
+
+/* After a LEFT node: arc curves down-right (occupies left 55%) */
+.curveLeft {
+  height: 56px;
+  width: 55%;
+  align-self: flex-start;
+  border-left: 4px solid var(--surface-2);
+  border-bottom: 4px solid var(--surface-2);
+  border-bottom-left-radius: 48px;
+}
+
+/* ── Locked toast ── */
+.lockedToast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--surface);
+  border: 1px solid var(--surface-2);
+  color: var(--text-secondary);
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  animation: fadeInUp 0.2s ease-out;
+  z-index: 100;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
