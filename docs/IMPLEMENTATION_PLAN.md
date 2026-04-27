@@ -27,8 +27,8 @@ For the product narrative see [`../CLAUDE.md`](../CLAUDE.md) (Product Vision sec
 | Journey map with chapters (Phase 2) | **Done** |
 | Lakehouse Levels (Phase 3) | **Done** |
 | Onboarding flow — opt-in via `VITE_ONBOARDING_ENABLED` (Phase 4) | **Done** |
-| Daily goal + streak shield (Phase 5) | Not built |
-| Badges & achievements (Phase 6) | Not built |
+| Daily goal + streak shield (Phase 5) | **Done** |
+| Badges & achievements (Phase 6) | **Done** |
 | Learning paths (Phase 7) | Not built |
 | New question types — code reading, match, order (Phase 8) | Not built |
 | Weekly leaderboard (Phase 9) | Not built |

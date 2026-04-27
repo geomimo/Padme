@@ -217,3 +217,29 @@
   font-weight: 700;
   color: var(--text-primary, #fff);
 }
+
+/* Badge unlock notification */
+.newBadges {
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.08) 0%, rgba(255, 214, 0, 0.03) 100%);
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.newBadgesTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffc800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 16px;
+}
+
+.newBadgesRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}

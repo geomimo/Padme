@@ -185,3 +185,32 @@
   font-family: var(--font-mono);
   color: var(--primary);
 }
+
+/* Badge wall */
+.badgeSection {
+  margin-top: 32px;
+}
+
+.badgeSectionHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.badgeSectionHeader h2 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.badgeCount {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.badgeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}

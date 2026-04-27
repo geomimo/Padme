@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { getLevelForXP, getNextLevel, xpProgressToNextLevel } from '../config/levels'
 import Navbar from '../components/Navbar'
+import BadgeIcon from '../components/BadgeIcon'
 import styles from './ProfilePage.module.css'
 
 const GOAL_PRESETS = [
@@ -12,8 +13,9 @@ const GOAL_PRESETS = [
 ]
 
 export default function ProfilePage() {
-  const { user, setUser, refreshUser } = useUser()
+  const { user, setUser } = useUser()
   const [savingGoal, setSavingGoal] = useState(false)
+  const [badges, setBadges] = useState([])
 
   const xp = user?.xp ?? 0
   const level = getLevelForXP(xp)
@@ -24,6 +26,13 @@ export default function ProfilePage() {
   const dailyGoal = user?.daily_goal_xp ?? 30
   const shields = user?.streak_shields ?? 0
   const dailyProgress = Math.min(dailyXp / dailyGoal, 1)
+
+  useEffect(() => {
+    if (!user?.id) return
+    fetch(`/api/users/${user.id}/badges`)
+      .then(r => r.json())
+      .then(setBadges)
+  }, [user?.id])
 
   const handleGoalChange = async (newGoal) => {
     if (savingGoal || newGoal === dailyGoal) return
@@ -36,6 +45,8 @@ export default function ProfilePage() {
     setUser(prev => ({ ...prev, daily_goal_xp: newGoal }))
     setSavingGoal(false)
   }
+
+  const earnedCount = badges.filter(b => b.earned).length
 
   return (
     <div className={styles.container}>
@@ -106,6 +117,20 @@ export default function ProfilePage() {
             <span className={styles.value}>{shields} 🛡️</span>
           </div>
         </div>
+
+        {badges.length > 0 && (
+          <div className={styles.badgeSection}>
+            <div className={styles.badgeSectionHeader}>
+              <h2>Badges</h2>
+              <span className={styles.badgeCount}>{earnedCount} / {badges.length}</span>
+            </div>
+            <div className={styles.badgeGrid}>
+              {badges.map(badge => (
+                <BadgeIcon key={badge.id} badge={badge} />
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

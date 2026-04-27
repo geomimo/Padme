@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from ..models import db, User, UserProgress
+from ..models import db, User, UserProgress, UserBadge
+from ..content.badges import BADGES, BADGES_BY_ID
 from datetime import date
 
 bp = Blueprint("users", __name__, url_prefix="/api/users")
@@ -66,3 +67,19 @@ def update_settings(user_id):
 
     db.session.commit()
     return jsonify({"ok": True, "daily_goal_xp": user.daily_goal_xp})
+
+
+@bp.route("/<user_id>/badges", methods=["GET"])
+def get_badges(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    earned = {ub.badge_id: ub.earned_at for ub in UserBadge.query.filter_by(user_id=user_id).all()}
+    result = []
+    for badge in BADGES:
+        entry = dict(badge)
+        entry["earned"] = badge["id"] in earned
+        entry["earned_at"] = earned[badge["id"]].isoformat() if badge["id"] in earned else None
+        result.append(entry)
+    return jsonify(result)

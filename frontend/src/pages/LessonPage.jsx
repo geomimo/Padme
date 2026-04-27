@@ -5,6 +5,7 @@ import { getLevelForXP } from '../config/levels'
 import Navbar from '../components/Navbar'
 import Exercise from '../components/Exercise'
 import FeedbackPanel from '../components/FeedbackPanel'
+import BadgeIcon from '../components/BadgeIcon'
 import styles from './LessonPage.module.css'
 
 // phase: 'question' | 'feedback' | 'results'
@@ -121,6 +122,17 @@ export default function LessonPage() {
             </div>
             <h1 className={styles.resultsTitle}>Lesson Complete!</h1>
             <p className={styles.xpLine}>+{result.xp_earned} XP &nbsp;·&nbsp; {result.streak} day streak 🔥</p>
+
+            {result.new_badges?.length > 0 && (
+              <div className={styles.newBadges}>
+                <h2 className={styles.newBadgesTitle}>Badge{result.new_badges.length > 1 ? 's' : ''} Unlocked!</h2>
+                <div className={styles.newBadgesRow}>
+                  {result.new_badges.map(badge => (
+                    <BadgeIcon key={badge.id} badge={{ ...badge, earned: true }} size="lg" />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {concepts.length > 0 && (
               <div className={styles.concepts}>

@@ -17,7 +17,7 @@ Full product detail: [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md
 
 ## Current Implementation State
 
-Phases 1–4 are complete. The app has a working core learning loop, journey map, level system, and optional onboarding flow.
+Phases 1–6 are complete. The app has a working core learning loop, journey map, level system, optional onboarding flow, daily goal + streak shields, and badges.
 
 | Feature | Status |
 |---|---|
@@ -27,8 +27,8 @@ Phases 1–4 are complete. The app has a working core learning loop, journey map
 | Onboarding wizard + placement quiz (Phase 4) | Done (opt-in via env var) |
 | 4 topics, 11 lessons, 44 exercises (MC + fill blank) | Done |
 | Anonymous users via `localStorage` user_id | Done |
-| Daily goal + streak shield (Phase 5) | Not built |
-| Badges & achievements (Phase 6) | Not built |
+| Daily goal + streak shield (Phase 5) | Done |
+| Badges & achievements (Phase 6) | Done |
 | Learning paths (Phase 7) | Not built |
 | New question types — code reading, match, order (Phase 8) | Not built |
 | Weekly leaderboard (Phase 9) | Not built |

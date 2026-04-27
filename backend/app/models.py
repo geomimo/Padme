@@ -20,6 +20,7 @@ class User(db.Model):
 
     progress = db.relationship("UserProgress", back_populates="user", cascade="all, delete-orphan")
     answers = db.relationship("UserAnswer", back_populates="user", cascade="all, delete-orphan")
+    badges = db.relationship("UserBadge", back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -66,3 +67,16 @@ class UserAnswer(db.Model):
     answered_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", back_populates="answers")
+
+
+class UserBadge(db.Model):
+    __tablename__ = "user_badges"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    badge_id = db.Column(db.String(50), nullable=False)
+    earned_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", back_populates="badges")
+
+    __table_args__ = (db.UniqueConstraint("user_id", "badge_id", name="unique_user_badge"),)

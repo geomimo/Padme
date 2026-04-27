@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from ..content.lessons import LESSONS, TOPICS
-from ..models import db, User, UserProgress, UserAnswer
+from ..content.badges import BADGES_BY_ID
+from ..models import db, User, UserProgress, UserAnswer, UserBadge
+from ..utils.badges import evaluate_badges
 from datetime import date, datetime
 
 bp = Blueprint("lessons", __name__, url_prefix="/api/lessons")
@@ -158,6 +160,11 @@ def complete_lesson(lesson_id):
             user.streak_shields += 1
             user.shield_granted_week = current_week
 
+    # Capture gap before updating last_active_date (needed for comeback badge)
+    gap_days = None
+    if user.last_active_date is not None and user.last_active_date != today:
+        gap_days = (today - user.last_active_date).days
+
     # Streak — a shield absorbs exactly one missed day (gap of 2)
     if user.last_active_date is None:
         user.streak = 1
@@ -172,7 +179,25 @@ def complete_lesson(lesson_id):
             user.streak = 1
     user.last_active_date = today
 
+    db.session.flush()  # write user changes so evaluate_badges sees updated streak
+
+    # Badge evaluation
+    all_progress = UserProgress.query.filter_by(user_id=user_id).all()
+    earned_ids = {ub.badge_id for ub in UserBadge.query.filter_by(user_id=user_id).all()}
+    newly_earned = evaluate_badges(
+        user, all_progress, earned_ids,
+        lesson_perfect=(score == total),
+        gap_days=gap_days,
+    )
+    for badge_id in newly_earned:
+        db.session.add(UserBadge(user_id=user_id, badge_id=badge_id))
+
     db.session.commit()
+
+    new_badges = [
+        {"id": bid, **{k: v for k, v in BADGES_BY_ID[bid].items() if k != "id"}}
+        for bid in newly_earned
+    ]
 
     return jsonify({
         "score": score,
@@ -183,5 +208,6 @@ def complete_lesson(lesson_id):
         "streak_shields": user.streak_shields,
         "daily_xp_today": user.daily_xp_today,
         "daily_goal_xp": user.daily_goal_xp,
+        "new_badges": new_badges,
         "results": results,
     })
