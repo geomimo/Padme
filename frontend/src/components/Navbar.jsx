@@ -1,9 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+import { getLevelForXP } from '../config/levels'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
   const { user } = useUser()
+  const xp = user?.xp ?? 0
+  const level = getLevelForXP(xp)
 
   return (
     <nav className={styles.nav}>
@@ -34,7 +37,8 @@ export default function Navbar() {
       </div>
 
       <div className={styles.stats}>
-        <span>{user?.xp ?? 0} XP</span>
+        <span className={styles.level}>{level.icon} {level.name}</span>
+        <span>{xp} XP</span>
         <span>{user?.streak ?? 0} 🔥</span>
       </div>
     </nav>

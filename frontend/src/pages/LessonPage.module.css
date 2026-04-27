@@ -176,3 +176,44 @@
   margin-top: 8px;
   padding: 12px 28px;
 }
+
+/* Level-up banner */
+.levelUpBanner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(255, 54, 33, 0.15), rgba(255, 200, 0, 0.1));
+  border: 1px solid rgba(255, 200, 0, 0.4);
+  border-radius: 12px;
+  padding: 16px 24px;
+  max-width: 360px;
+  width: 100%;
+  animation: levelUpPop 0.4s ease;
+}
+
+@keyframes levelUpPop {
+  0%   { transform: scale(0.85); opacity: 0; }
+  70%  { transform: scale(1.04); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+.levelUpIcon {
+  font-size: 2.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.levelUpTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ffc800;
+  margin-bottom: 2px;
+}
+
+.levelUpName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}

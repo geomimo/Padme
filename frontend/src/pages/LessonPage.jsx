@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+import { getLevelForXP } from '../config/levels'
 import Navbar from '../components/Navbar'
 import Exercise from '../components/Exercise'
 import FeedbackPanel from '../components/FeedbackPanel'
@@ -19,6 +20,7 @@ export default function LessonPage() {
   const [answers, setAnswers] = useState({})   // accumulated correct answers for /complete
   const [feedback, setFeedback] = useState(null)
   const [result, setResult] = useState(null)
+  const [levelUp, setLevelUp] = useState(null)  // new level if levelled up
   const [isChecking, setIsChecking] = useState(false)
   const [isCompleting, setIsCompleting] = useState(false)
 
@@ -55,7 +57,6 @@ export default function LessonPage() {
 
   const handleContinue = async () => {
     if (!feedback.correct) {
-      // Wrong — retry same question
       setCurrentAnswer('')
       setFeedback(null)
       setPhase('question')
@@ -64,7 +65,6 @@ export default function LessonPage() {
 
     const isLast = currentIndex === exercises.length - 1
     if (isLast) {
-      // All done — call /complete
       setIsCompleting(true)
       const finalAnswers = { ...answers, [exercise.id]: currentAnswer }
       const res = await fetch(`/api/lessons/${lessonId}/complete`, {
@@ -73,6 +73,11 @@ export default function LessonPage() {
         body: JSON.stringify({ user_id: user.id, answers: finalAnswers }),
       })
       const data = await res.json()
+
+      const prevLevel = getLevelForXP(user.xp ?? 0)
+      const newLevel = getLevelForXP(data.total_xp ?? 0)
+      if (newLevel.min > prevLevel.min) setLevelUp(newLevel)
+
       setResult(data)
       setUser(prev => ({ ...prev, xp: data.total_xp, streak: data.streak }))
       setPhase('results')
@@ -94,6 +99,16 @@ export default function LessonPage() {
         <Navbar />
         <main className={styles.main}>
           <div className={styles.results}>
+            {levelUp && (
+              <div className={styles.levelUpBanner}>
+                <span className={styles.levelUpIcon}>{levelUp.icon}</span>
+                <div>
+                  <div className={styles.levelUpTitle}>Level Up!</div>
+                  <div className={styles.levelUpName}>{levelUp.name}</div>
+                </div>
+              </div>
+            )}
+
             <div className={styles.scoreCircle}>
               <span className={styles.scoreText}>{result.score}/{result.total}</span>
             </div>
