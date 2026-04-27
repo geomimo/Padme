@@ -2,9 +2,27 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Product Vision
 
-Padme is a Duolingo-style interactive learning application for Databricks concepts. Users progress through structured lessons covering Spark, Delta Lake, MLflow, and Unity Catalog, earning XP and tracking streaks. The app is self-contained — no live Databricks connection required.
+Padme is the definitive Duolingo-style learning app for the Databricks ecosystem. The core promise: **show up every day, get a little better, earn proof of it.**
+
+Users learn through three entry points:
+- **The Journey** — a linear, progressively harder road through all Databricks content, divided into chapters each ending with a Boss Lesson
+- **Topics** — a browsable catalog for targeted, self-directed learning, showing per-topic mastery levels
+- **Learning Paths** — curated lesson collections around a goal (e.g. *Databricks Associate Exam Prep*), with enrollment, progress tracking, and a shareable completion certificate
+
+The lesson experience is one question at a time: a wrong answer shows a contextual explanation and retries; a correct answer shows a reinforcement note and advances. XP and a named **Lakehouse Level** accumulate across sessions. A daily streak, streak shields, daily XP goals, badges, and an opt-in weekly leaderboard drive retention.
+
+Full product detail: [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)
+
+## Current Implementation State
+
+The app is in early stage. What exists today:
+- Topic grid → lesson list → lesson page flow (no Journey map yet)
+- Batch question submission (all questions answered then submitted together — not yet one-at-a-time with immediate feedback)
+- XP (`xp_reward + 5×correct`) and daily streak
+- 4 topics, 11 lessons, 44 exercises (multiple choice + fill blank)
+- Anonymous users via `localStorage` user_id
 
 **No auth** — users are anonymous. A `user_id` is created on first visit and stored in `localStorage`. No JWT, no login flow.
 
