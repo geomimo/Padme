@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { UserProvider } from './context/UserContext'
+import { UserProvider, useUser } from './context/UserContext'
 import Home from './pages/Home'
 import JourneyPage from './pages/JourneyPage'
 import TopicPage from './pages/TopicPage'
@@ -8,9 +8,19 @@ import ProfilePage from './pages/ProfilePage'
 import OnboardingPage from './pages/OnboardingPage'
 import PlacementQuizPage from './pages/PlacementQuizPage'
 
+const ONBOARDING_ENABLED = import.meta.env.VITE_ONBOARDING_ENABLED === 'true'
+
 function RequireUser({ children }) {
-  const userId = localStorage.getItem('user_id')
-  if (!userId) return <Navigate to="/onboarding" replace />
+  const { loading } = useUser()
+
+  if (!ONBOARDING_ENABLED) {
+    // Auto-create path: just wait for UserContext to finish creating the user
+    if (loading) return null
+    return children
+  }
+
+  // Onboarding path: redirect immediately if no user_id in storage
+  if (!localStorage.getItem('user_id')) return <Navigate to="/onboarding" replace />
   return children
 }
 

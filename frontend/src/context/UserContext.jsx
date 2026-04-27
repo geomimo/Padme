@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const UserContext = createContext()
 
+const ONBOARDING_ENABLED = import.meta.env.VITE_ONBOARDING_ENABLED === 'true'
+
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -16,7 +18,17 @@ export function UserProvider({ children }) {
     const userId = localStorage.getItem('user_id')
     if (userId) {
       loadUser(userId).finally(() => setLoading(false))
+    } else if (!ONBOARDING_ENABLED) {
+      // Onboarding off: auto-create an anonymous user (original behaviour)
+      fetch('/api/users/', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          localStorage.setItem('user_id', data.id)
+          return loadUser(data.id)
+        })
+        .finally(() => setLoading(false))
     } else {
+      // Onboarding on: wait for OnboardingPage to call initUser
       setLoading(false)
     }
   }, [loadUser])
