@@ -37,8 +37,19 @@ export default function LessonPage() {
   const exercise = exercises[currentIndex]
   const progress = ((currentIndex) / exercises.length) * 100
 
+  const isAnswerReady = () => {
+    if (!currentAnswer) return false
+    if (exercise.type === 'match_pairs') {
+      try {
+        const matched = JSON.parse(currentAnswer)
+        return Object.keys(matched).length === exercise.lefts.length
+      } catch { return false }
+    }
+    return true
+  }
+
   const handleCheck = async () => {
-    if (!currentAnswer) return
+    if (!isAnswerReady()) return
     setIsChecking(true)
 
     const res = await fetch(`/api/lessons/${lessonId}/check`, {
@@ -186,7 +197,7 @@ export default function LessonPage() {
             <button
               className={styles.checkBtn}
               onClick={handleCheck}
-              disabled={!currentAnswer || isChecking}
+              disabled={!isAnswerReady() || isChecking}
             >
               {isChecking ? 'Checking...' : 'Check'}
             </button>

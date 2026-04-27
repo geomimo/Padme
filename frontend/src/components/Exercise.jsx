@@ -1,3 +1,6 @@
+import ExerciseCodeReading from './ExerciseCodeReading'
+import ExerciseMatchPairs from './ExerciseMatchPairs'
+import ExerciseOrderSteps from './ExerciseOrderSteps'
 import styles from './Exercise.module.css'
 
 export default function Exercise({ exercise, answer, onAnswer, disabled }) {
@@ -37,6 +40,18 @@ export default function Exercise({ exercise, answer, onAnswer, disabled }) {
         />
       </div>
     )
+  }
+
+  if (exercise.type === 'code_reading') {
+    return <ExerciseCodeReading exercise={exercise} answer={answer} onAnswer={onAnswer} disabled={disabled} />
+  }
+
+  if (exercise.type === 'match_pairs') {
+    return <ExerciseMatchPairs exercise={exercise} answer={answer} onAnswer={onAnswer} disabled={disabled} />
+  }
+
+  if (exercise.type === 'order_steps') {
+    return <ExerciseOrderSteps exercise={exercise} answer={answer} onAnswer={onAnswer} disabled={disabled} />
   }
 
   return null

@@ -32,6 +32,12 @@ export default function Navbar() {
           Paths
         </NavLink>
         <NavLink
+          to="/leaderboard"
+          className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}
+        >
+          League
+        </NavLink>
+        <NavLink
           to="/profile"
           className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}
         >

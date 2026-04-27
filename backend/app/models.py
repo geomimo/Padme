@@ -17,11 +17,14 @@ class User(db.Model):
     daily_xp_today = db.Column(db.Integer, default=0)
     daily_xp_date = db.Column(db.Date, nullable=True)
     shield_granted_week = db.Column(db.Integer, nullable=True)
+    leaderboard_opt_in = db.Column(db.Boolean, default=False)
+    league_tier = db.Column(db.Integer, default=1)
 
     progress = db.relationship("UserProgress", back_populates="user", cascade="all, delete-orphan")
     answers = db.relationship("UserAnswer", back_populates="user", cascade="all, delete-orphan")
     badges = db.relationship("UserBadge", back_populates="user", cascade="all, delete-orphan")
     paths = db.relationship("UserPath", back_populates="user", cascade="all, delete-orphan")
+    weekly_xp = db.relationship("UserWeeklyXP", back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -95,3 +98,17 @@ class UserPath(db.Model):
     user = db.relationship("User", back_populates="paths")
 
     __table_args__ = (db.UniqueConstraint("user_id", "path_id", name="unique_user_path"),)
+
+
+class UserWeeklyXP(db.Model):
+    __tablename__ = "user_weekly_xp"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    iso_week = db.Column(db.String(8), nullable=False)   # e.g. "2026-W17"
+    weekly_xp = db.Column(db.Integer, default=0)
+    league_tier = db.Column(db.Integer, default=1)
+
+    user = db.relationship("User", back_populates="weekly_xp")
+
+    __table_args__ = (db.UniqueConstraint("user_id", "iso_week", name="unique_user_week"),)

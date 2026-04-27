@@ -9,6 +9,8 @@ import OnboardingPage from './pages/OnboardingPage'
 import PlacementQuizPage from './pages/PlacementQuizPage'
 import PathsPage from './pages/PathsPage'
 import PathDetailPage from './pages/PathDetailPage'
+import LeaderboardPage from './pages/LeaderboardPage'
+import PublicProfilePage from './pages/PublicProfilePage'
 
 const ONBOARDING_ENABLED = import.meta.env.VITE_ONBOARDING_ENABLED === 'true'
 
@@ -41,6 +43,8 @@ export default function App() {
           <Route path="/profile" element={<RequireUser><ProfilePage /></RequireUser>} />
           <Route path="/paths" element={<RequireUser><PathsPage /></RequireUser>} />
           <Route path="/paths/:pathId" element={<RequireUser><PathDetailPage /></RequireUser>} />
+          <Route path="/leaderboard" element={<RequireUser><LeaderboardPage /></RequireUser>} />
+          <Route path="/profile/:userId" element={<PublicProfilePage />} />
         </Routes>
       </UserProvider>
     </Router>

@@ -16,6 +16,7 @@ export default function ProfilePage() {
   const { user, setUser } = useUser()
   const [savingGoal, setSavingGoal] = useState(false)
   const [badges, setBadges] = useState([])
+  const [copied, setCopied] = useState(false)
 
   const xp = user?.xp ?? 0
   const level = getLevelForXP(xp)
@@ -48,12 +49,28 @@ export default function ProfilePage() {
 
   const earnedCount = badges.filter(b => b.earned).length
 
+  const handleShare = () => {
+    const url = `${window.location.origin}/profile/${user.id}`
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
   return (
     <div className={styles.container}>
       <Navbar />
       <main className={styles.main}>
         <Link to="/" className={styles.back}>← Home</Link>
-        <h1>Profile</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <h1 style={{ margin: 0 }}>Profile</h1>
+          <button
+            onClick={handleShare}
+            style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: 8, background: 'var(--surface-2)', border: '1px solid var(--surface-2)', color: copied ? 'var(--success)' : 'var(--text-secondary)', cursor: 'pointer' }}
+          >
+            {copied ? '✓ Copied!' : '🔗 Share Profile'}
+          </button>
+        </div>
 
         <div className={styles.levelCard}>
           <div className={styles.levelHeader}>

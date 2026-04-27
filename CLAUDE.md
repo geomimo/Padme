@@ -17,7 +17,7 @@ Full product detail: [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md
 
 ## Current Implementation State
 
-Phases 1–7 are complete. The app has a working core learning loop, journey map, level system, optional onboarding flow, daily goal + streak shields, badges, and learning paths.
+All 10 phases are complete. The app has a full learning loop, journey map, level system, optional onboarding, daily goal + streak shields, badges, learning paths, new question types, weekly leaderboard, and shareable public profiles.
 
 | Feature | Status |
 |---|---|
@@ -25,14 +25,14 @@ Phases 1–7 are complete. The app has a working core learning loop, journey map
 | Journey map with chapters and winding road (Phase 2) | Done |
 | Lakehouse Levels (XP thresholds → named levels) (Phase 3) | Done |
 | Onboarding wizard + placement quiz (Phase 4) | Done (opt-in via env var) |
-| 4 topics, 11 lessons, 44 exercises (MC + fill blank) | Done |
+| 4 topics, 11 lessons, 52 exercises (MC + fill blank + code_reading + match_pairs + order_steps) | Done |
 | Anonymous users via `localStorage` user_id | Done |
 | Daily goal + streak shield (Phase 5) | Done |
 | Badges & achievements (Phase 6) | Done |
 | Learning paths (Phase 7) | Done |
-| New question types — code reading, match, order (Phase 8) | Not built |
-| Weekly leaderboard (Phase 9) | Not built |
-| Shareable public profile (Phase 10) | Not built |
+| New question types — code reading, match pairs, order steps (Phase 8) | Done |
+| Weekly leaderboard with league tiers (Phase 9) | Done |
+| Shareable public profile (Phase 10) | Done |
 
 **No auth** — users are anonymous. A `user_id` is created on first visit and stored in `localStorage`. No JWT, no login flow.
 
@@ -73,13 +73,14 @@ padme/
 ├── backend/
 │   ├── app/
 │   │   ├── __init__.py          # Flask factory — registers blueprints, calls db.create_all()
-│   │   ├── models.py            # User, UserProgress, UserAnswer
+│   │   ├── models.py            # User, UserProgress, UserAnswer, UserBadge, UserPath, UserWeeklyXP
 │   │   ├── routes/
-│   │   │   ├── users.py         # POST /api/users/, GET /api/users/<id> (+ level fields)
+│   │   │   ├── users.py         # POST /api/users/, GET /api/users/<id>, GET /api/users/<id>/public
 │   │   │   ├── topics.py        # GET /api/topics/
 │   │   │   ├── lessons.py       # GET /api/lessons/, GET /api/lessons/<id>,
 │   │   │   │                    # POST /api/lessons/<id>/check, POST /api/lessons/<id>/complete
-│   │   │   └── journey.py       # GET /api/journey/?user_id=<id>
+│   │   │   ├── journey.py       # GET /api/journey/?user_id=<id>
+│   │   │   └── leaderboard.py   # GET /api/leaderboard/?user_id=<id>
 │   │   └── content/
 │   │       └── lessons.py       # Static content: TOPICS, CHAPTERS, LESSONS
 │   ├── tests/
@@ -102,9 +103,12 @@ padme/
     │   │   ├── FeedbackPanel.jsx/module.css  # Correct/wrong feedback after /check
     │   │   ├── TopicCard.jsx/module.css   # data-topic attr drives per-topic hover glow
     │   │   ├── LessonCard.jsx/module.css
-    │   │   ├── Exercise.jsx               # Routes to ExerciseMultipleChoice or ExerciseFillBlank
-    │   │   ├── ExerciseMultipleChoice.jsx # A/B/C/D letter badges
-    │   │   └── ExerciseFillBlank.jsx      # inline underline input
+    │   │   ├── Exercise.jsx               # Routes to all exercise type components
+    │   │   ├── ExerciseCodeReading.jsx    # Code block + MC options
+    │   │   ├── ExerciseMatchPairs.jsx     # Two-column tap-to-pair
+    │   │   ├── ExerciseOrderSteps.jsx     # Up/down arrow reordering
+    │   │   ├── LeagueBadge.jsx            # Bronze/Silver/Gold/Diamond tier badge
+    │   │   └── BadgeIcon.jsx              # Earned/locked badge with tooltip
     │   └── pages/
     │       ├── JourneyPage.jsx/module.css   # Default home — scrollable chapter road
     │       ├── OnboardingPage.jsx/module.css # 3-step wizard (goal / experience / daily time)
@@ -112,15 +116,20 @@ padme/
     │       ├── Home.jsx/module.css          # Topic grid (accessible via /topics)
     │       ├── TopicPage.jsx/module.css     # Lesson list for a topic
     │       ├── LessonPage.jsx/module.css    # One-question-at-a-time flow + results screen
-    │       └── ProfilePage.jsx/module.css   # Level card + XP progress bar + stats
+    │       ├── LeaderboardPage.jsx/module.css # Opt-in weekly league
+    │       ├── PublicProfilePage.jsx/module.css # Shareable read-only profile at /profile/:userId
+    │       └── ProfilePage.jsx/module.css   # Level card + XP progress bar + stats + share button
     └── vite.config.js            # port 3000, /api proxy to :5000
 ```
 
 ## Data model
 
-- **User** — `id`, `xp`, `streak`, `last_active_date`. No username/password.
+- **User** — `id`, `xp`, `streak`, `last_active_date`, `daily_goal_xp`, `streak_shields`, `daily_xp_today`, `leaderboard_opt_in`, `league_tier`. No username/password.
 - **UserProgress** — `user_id`, `lesson_id` (string), `score`, `total`, `xp_earned`. Unique per user+lesson; best score is kept on retry.
 - **UserAnswer** — log of every individual exercise attempt.
+- **UserBadge** — `user_id`, `badge_id`, `earned_at`. Unique per user+badge.
+- **UserPath** — `user_id`, `path_id`, `enrolled_at`, `completed_at`. Unique per user+path.
+- **UserWeeklyXP** — `user_id`, `iso_week` (e.g. "2026-W17"), `weekly_xp`, `league_tier`. Unique per user+week.
 
 No Topic/Lesson/Exercise DB tables — all content is static in `backend/app/content/lessons.py`.
 
@@ -131,13 +140,17 @@ Defined in `backend/app/content/lessons.py` as three structures:
 - `CHAPTERS` — ordered list of chapter dicts (`id`, `title`, `lesson_ids`, `boss_lesson_id`, `order`). A chapter is unlocked when the previous chapter's boss lesson is completed; the first chapter is always unlocked.
 - `LESSONS` — dict keyed by `lesson_id`; each lesson has `chapter_id`, `order`, `boss` flag, and an `exercises` list
 
-Exercise types: `multiple_choice` (options list + correct_answer) and `fill_blank` (correct_answer string, case-insensitive match). **Correct answers are stripped before sending to the frontend** — only returned in the `/check` and `/complete` responses.
+Exercise types: `multiple_choice`, `fill_blank`, `code_reading`, `match_pairs`, `order_steps`. **Correct answers are stripped before sending to the frontend** — only returned in the `/check` and `/complete` responses.
 
-Current content: 4 topics, 4 chapters, 11 lessons, 44 exercises.
-- Spark Fundamentals / ch_spark: spark_intro, spark_dataframes, spark_ops
-- Delta Lake / ch_delta: delta_intro, delta_acid, delta_timetravel
-- MLflow / ch_mlflow: mlflow_tracking, mlflow_registry
-- Unity Catalog / ch_unity: unity_intro, unity_namespace
+- `code_reading` — same as MC but includes a `code` field with a syntax-highlighted code snippet
+- `match_pairs` — `lefts[]` + `rights[]` arrays; answer is a JSON dict `{left: right}`
+- `order_steps` — `steps[]` array; answer is a JSON array of original step indices in user's order
+
+Current content: 4 topics, 4 chapters, 11 lessons, 52 exercises.
+- Spark Fundamentals / ch_spark: spark_intro (code_reading), spark_dataframes (match_pairs), spark_ops (order_steps)
+- Delta Lake / ch_delta: delta_intro (code_reading), delta_acid (match_pairs), delta_timetravel
+- MLflow / ch_mlflow: mlflow_tracking (code_reading), mlflow_registry
+- Unity Catalog / ch_unity: unity_intro (match_pairs), unity_namespace (order_steps)
 
 ## XP & streaks
 
@@ -176,13 +189,17 @@ All endpoints prefixed `/api/`. Frontend proxies `/api` to `:5000`.
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/users/` | Create anonymous user → `{id, xp, streak, ...}` |
-| `GET` | `/api/users/<id>` | User profile + completed lessons + `level_name`, `level_icon`, `xp_to_next_level` |
+| `GET` | `/api/users/<id>` | User profile + completed lessons + level + leaderboard fields |
+| `GET` | `/api/users/<id>/public` | Public read-only profile (XP, level, streak, badges, mastery) |
+| `PATCH` | `/api/users/<id>/settings` | Update `daily_goal_xp`, `leaderboard_opt_in` |
+| `GET` | `/api/users/<id>/badges` | All badges with earned status |
 | `GET` | `/api/topics/?user_id=<id>` | Topics with completion % |
 | `GET` | `/api/lessons/?topic_id=<id>&user_id=<id>` | Lessons for a topic |
 | `GET` | `/api/lessons/<id>` | Lesson detail + exercises (no correct answers) |
 | `POST` | `/api/lessons/<id>/check` | `{user_id, exercise_id, answer}` → `{correct, explanation}` |
-| `POST` | `/api/lessons/<id>/complete` | `{user_id, answers}` → `{score, xp_earned, total_xp, streak, results}` |
+| `POST` | `/api/lessons/<id>/complete` | `{user_id, answers}` → `{score, xp_earned, total_xp, streak, results, new_badges}` |
 | `GET` | `/api/journey/?user_id=<id>` | Chapters with lessons and per-lesson completion + unlock status |
+| `GET` | `/api/leaderboard/?user_id=<id>` | Weekly league leaderboard for user's tier |
 
 ## Design system
 

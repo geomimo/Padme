@@ -2,9 +2,10 @@ from flask import Blueprint, request, jsonify
 from ..content.lessons import LESSONS, TOPICS
 from ..content.badges import BADGES_BY_ID
 from ..content.paths import PATHS
-from ..models import db, User, UserProgress, UserAnswer, UserBadge, UserPath
+from ..models import db, User, UserProgress, UserAnswer, UserBadge, UserPath, UserWeeklyXP
 from ..utils.badges import evaluate_badges
 from datetime import date, datetime
+import json
 
 bp = Blueprint("lessons", __name__, url_prefix="/api/lessons")
 
@@ -12,6 +13,28 @@ def strip_answers(exercise):
     ex = dict(exercise)
     ex.pop("correct_answer", None)
     return ex
+
+def _check_exercise(exercise, user_answer):
+    """Return True if user_answer is correct for the given exercise."""
+    correct = exercise["correct_answer"]
+    etype = exercise["type"]
+    if etype in ("multiple_choice", "code_reading"):
+        return user_answer == str(correct)
+    if etype == "fill_blank":
+        return user_answer.lower() == str(correct).lower()
+    if etype == "match_pairs":
+        try:
+            submitted = json.loads(user_answer) if isinstance(user_answer, str) else user_answer
+            return submitted == correct
+        except (json.JSONDecodeError, TypeError):
+            return False
+    if etype == "order_steps":
+        try:
+            submitted = json.loads(user_answer) if isinstance(user_answer, str) else user_answer
+            return submitted == correct
+        except (json.JSONDecodeError, TypeError):
+            return False
+    return False
 
 @bp.route("/", methods=["GET"])
 def get_lessons():
@@ -63,13 +86,7 @@ def check_answer(lesson_id):
     if not exercise:
         return jsonify({"error": "Exercise not found"}), 404
 
-    correct_answer = exercise["correct_answer"]
-    if exercise["type"] == "multiple_choice":
-        is_correct = user_answer == str(correct_answer)
-    elif exercise["type"] == "fill_blank":
-        is_correct = user_answer.lower() == str(correct_answer).lower()
-    else:
-        is_correct = False
+    is_correct = _check_exercise(exercise, user_answer)
 
     explanation = exercise["explanation_correct"] if is_correct else exercise["explanation_wrong"]
 
@@ -104,14 +121,11 @@ def complete_lesson(lesson_id):
 
     for exercise in lesson["exercises"]:
         ex_id = exercise["id"]
-        correct_answer = exercise["correct_answer"]
-        user_answer = answers.get(ex_id, "").strip()
+        user_answer = answers.get(ex_id, "")
+        if isinstance(user_answer, str):
+            user_answer = user_answer.strip()
 
-        is_correct = False
-        if exercise["type"] == "multiple_choice":
-            is_correct = user_answer == str(correct_answer)
-        elif exercise["type"] == "fill_blank":
-            is_correct = user_answer.lower() == str(correct_answer).lower()
+        is_correct = _check_exercise(exercise, user_answer)
 
         if is_correct:
             score += 1
@@ -119,7 +133,7 @@ def complete_lesson(lesson_id):
         results[ex_id] = {
             "correct": is_correct,
             "user_answer": user_answer,
-            "correct_answer": str(correct_answer),
+            "correct_answer": json.dumps(exercise["correct_answer"]) if isinstance(exercise["correct_answer"], (dict, list)) else str(exercise["correct_answer"]),
             "explanation": exercise["explanation_correct"],
         }
 
@@ -179,6 +193,17 @@ def complete_lesson(lesson_id):
         else:
             user.streak = 1
     user.last_active_date = today
+
+    # Weekly leaderboard XP accumulation
+    if user.leaderboard_opt_in and xp_delta > 0:
+        iso = today.isocalendar()
+        iso_week = f"{iso[0]}-W{iso[1]:02d}"
+        weekly = UserWeeklyXP.query.filter_by(user_id=user_id, iso_week=iso_week).first()
+        if weekly:
+            weekly.weekly_xp += xp_delta
+        else:
+            weekly = UserWeeklyXP(user_id=user_id, iso_week=iso_week, weekly_xp=xp_delta, league_tier=user.league_tier)
+            db.session.add(weekly)
 
     db.session.flush()  # write user changes so evaluate_badges sees updated streak
 
