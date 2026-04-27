@@ -15,25 +15,24 @@ For the product narrative see [`../CLAUDE.md`](../CLAUDE.md) (Product Vision sec
 
 ---
 
-## Current State (baseline)
+## Current State
 
 | Area | Status |
 |---|---|
 | Topic grid → lesson list → lesson page | Done |
-| Batch question submit + results screen | Done |
 | XP (`xp_reward + 5×correct`) + daily streak | Done |
-| 4 topics, 11 lessons, 44 exercises (MC + fill blank) | Done |
+| 4 topics, 4 chapters, 11 lessons, 44 exercises (MC + fill blank) | Done |
 | Anonymous user via localStorage | Done |
-| Per-question flow with immediate feedback | **Not built** |
-| Journey map with chapters | **Not built** |
-| Lakehouse Levels | **Not built** |
-| Onboarding flow | **Not built** |
-| Daily goal + streak shield | **Not built** |
-| Badges & achievements | **Not built** |
-| Learning paths | **Not built** |
-| New question types (code reading, match, order) | **Not built** |
-| Weekly leaderboard | **Not built** |
-| Shareable public profile | **Not built** |
+| Per-question flow with immediate feedback (Phase 1) | **Done** |
+| Journey map with chapters (Phase 2) | **Done** |
+| Lakehouse Levels (Phase 3) | **Done** |
+| Onboarding flow — opt-in via `VITE_ONBOARDING_ENABLED` (Phase 4) | **Done** |
+| Daily goal + streak shield (Phase 5) | Not built |
+| Badges & achievements (Phase 6) | Not built |
+| Learning paths (Phase 7) | Not built |
+| New question types — code reading, match, order (Phase 8) | Not built |
+| Weekly leaderboard (Phase 9) | Not built |
+| Shareable public profile (Phase 10) | Not built |
 
 ---
 
